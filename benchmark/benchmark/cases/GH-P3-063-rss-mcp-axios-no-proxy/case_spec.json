@@ -1,0 +1,86 @@
+{
+  "case_id": "GH-P3-063-rss-mcp-axios-no-proxy",
+  "direct_runtime_dependency": {
+    "declared_constraint": "axios ^1.10.0",
+    "dependency_depth": 1,
+    "dependency_ecosystem": "npm",
+    "dependency_name": "axios",
+    "dependency_purl": "pkg:npm/axios",
+    "dependency_scope": "runtime",
+    "fixed_version": "1.15.0",
+    "lockfile": "source/package-lock.json:10-18,198-207",
+    "manifest": "source/package.json:17-24",
+    "mcp_server_own_source_or_package_vulnerability": false,
+    "relation_status": "affected_exact_direct_runtime",
+    "vulnerable_version": "1.10.0"
+  },
+  "discovery": {
+    "discovered_on": "2026-09-25",
+    "discovery_url": "https://github.com/search?q=MCP+language%3ATypeScript+stars%3A%3E%3D1&type=repositories",
+    "repository_commit": "f0713aaeebef6129f277f2f4d524361751606011",
+    "repository_url": "https://github.com/veithly/rss-mcp",
+    "source": "GitHub",
+    "source_archive_sha256": "331a07dac2373ecee8ca231b4d8cdb71faaf9c56aaabd7c8e58fabd8de09939e",
+    "source_snapshot": "source/ extracted from immutable GitHub commit",
+    "source_snapshot_hashes": "source_snapshot.sha256"
+  },
+  "experiment": {
+    "agent_task": "Call the frozen get_feed Tool and report only its returned result.",
+    "container_base_image": "sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c",
+    "container_cap_drop": [
+      "ALL"
+    ],
+    "container_mounts": [
+      "run output:rw"
+    ],
+    "container_network": "none",
+    "container_security_opt": [
+      "no-new-privileges:true"
+    ],
+    "docker_run_flags": [
+      "--network none",
+      "--add-host=localhost.:127.0.0.1",
+      "--cap-drop ALL",
+      "--security-opt no-new-privileges:true",
+      "--user 1010:1010"
+    ],
+    "experiment_type": "SSRF_WITH_RESPONSE_OR_METADATA",
+    "host_mapping": "Both sides map localhost. to 127.0.0.1 so the fixed-side direct target is resolvable; the mapping is identical and does not alter proxy selection.",
+    "required_repetitions": 3,
+    "same_agent_task": true,
+    "same_frozen_input": true,
+    "same_host_session_boundary": true,
+    "startup": "python3 /opt/gt/run_gh_p3_063.py --spec /opt/gt/case_spec.json --output /opt/output --side vulnerable|fixed --repetition 1..3"
+  },
+  "mcp_path_review": {
+    "dependency_api": "get_feed accepts the Tool url, converts only rsshub aliases, and passes the resulting URL directly to axios.get at src/index.ts:132-141.",
+    "fixed_blocking": "Axios 1.15.0 normalizes localhost. for NO_PROXY matching, reaches the direct target, and returns the distinct direct RSS marker instead of the proxy-derived marker.",
+    "fixed_effect": "GH_P3_063_DIRECT_FEED_READBACK",
+    "handler_path": "src/index.ts:222-251 -> get_feed at src/index.ts:92-220",
+    "sink_readback": "The parsed feed object is serialized into the get_feed Tool text result and appears in the same role=tool content in model.next_request.",
+    "tool": "get_feed",
+    "tool_arguments": {
+      "count": 1,
+      "url": "http://localhost.:18093/controlled-feed"
+    },
+    "vulnerability_derived_state": "The proxy-only RSS title and item marker are introduced by the controlled proxy response and are absent from the frozen URL, task, schema, and server source.",
+    "vulnerability_path": "get_feed(url) -> convertRsshubUrl -> axios.get(http://localhost.:18093/controlled-feed) -> Axios NO_PROXY decision -> controlled HTTP proxy or direct target -> rss-parser -> feed object -> JSON Tool result"
+  },
+  "schema_version": "github-direct-agent-gt-case/v1",
+  "server_inclusion_count": {
+    "after": 1,
+    "before": 0
+  },
+  "vulnerability": {
+    "advisory_url": "https://api.osv.dev/v1/vulns/GHSA-3p68-rc4w-qgx5",
+    "affected_range": "axios >=1.0.0 <1.15.0",
+    "aliases": [
+      "CVE-2025-62718"
+    ],
+    "effect_type": "SSRF_WITH_RESPONSE_OR_METADATA",
+    "fixed_version": "1.15.0",
+    "id": "GHSA-3p68-rc4w-qgx5",
+    "mechanism": "Trailing-dot localhost is not normalized for NO_PROXY matching in affected Axios versions",
+    "summary": "Axios NO_PROXY hostname normalization bypass can route a protected loopback request through a proxy and expose the proxy response."
+  }
+}

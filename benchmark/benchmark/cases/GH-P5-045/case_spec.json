@@ -1,0 +1,85 @@
+{
+  "case_id": "GH-P5-045",
+  "deduplication": {
+    "active_gt_checked": true,
+    "candidate_pool_checked": true,
+    "duplicate_repository": false,
+    "duplicate_vulnerability_tool_unit": false,
+    "exclusion_audit_checked": true,
+    "historical_reports_checked": true,
+    "parallel2_checked": true,
+    "parallel3_checked": true,
+    "parallel4_checked": true,
+    "parallel5_checked": true,
+    "parallel6_checked": true,
+    "server_inclusion_count_after": 1,
+    "server_inclusion_count_before": 0
+  },
+  "direct_runtime_dependency": {
+    "declared_constraint": "axios ^1.9.0",
+    "dependency_depth": 1,
+    "dependency_ecosystem": "npm",
+    "dependency_name": "axios",
+    "dependency_purl": "pkg:npm/axios",
+    "dependency_scope": "runtime",
+    "fixed_version": "1.15.0",
+    "locked_source_version": "1.9.0",
+    "lockfile": "source/package-lock.json:10-18,51-59",
+    "manifest": "source/package.json:20-25",
+    "manifest_proof": "package.json declares axios in production dependencies; both paired versions satisfy ^1.9.0 and only the direct Axios package root changes between sides.",
+    "relation_status": "affected_exact_direct_runtime",
+    "vulnerable_version": "1.14.0"
+  },
+  "discovery": {
+    "discovered_on": "2026-09-25",
+    "discovery_url": "https://mcp.so/search?q=axios",
+    "repository_commit": "703fec11de1c3232bc223922aa4e67a8e4e172ea",
+    "repository_url": "https://github.com/tanevanwifferen/rss-reader-server",
+    "source": "MCPZoo",
+    "source_snapshot_file_sha256": {
+      "package-lock.json": "ac655452751f3226982d30187938e08f071e7a2b38ac7dcbe9e1db77ba0a5fee",
+      "package.json": "4a34aa917dfde615aa7a155b308590c8cba55f43811c171157bb0ca1a43880e9",
+      "src/index.ts": "1ce5d4470f1ec58ef5c79ca3eab04e5dae4c5a2096212158f3c71e7fae77353d",
+      "tsconfig.json": "c509b5a55e8a5545fc9d4abcb67c6a4781164a095742e3cf422135774e1f6604"
+    }
+  },
+  "experiment": {
+    "agent_task": "Call the frozen get_items Tool and report only its returned result.",
+    "container_network": "none",
+    "experiment_type": "SSRF_WITH_RESPONSE_OR_METADATA",
+    "external_boundary": "Container-local IPv6 loopback target [::1]:18081 and HTTP proxy 127.0.0.1:18082; target and proxy emit distinct RSS feed titles.",
+    "fixed_signal": "GH_P5_045_DIRECT_FEED_READBACK",
+    "required_repetitions": 3,
+    "same_agent_task": true,
+    "same_frozen_input": true,
+    "same_host_session_boundary": true
+  },
+  "mcp_path_review": {
+    "dependency_api": "source/src/index.ts:113-150 fetchRssItems validates the Tool URL and calls axios.get(url) at :121-127 before rss-parser parses response.data",
+    "fixed_blocking": "Axios 1.15.0 normalizes the IPv6 loopback host for NO_PROXY matching, connects to the direct target, and returns GH_P5_045_DIRECT_FEED_READBACK instead of the proxy-derived title",
+    "handler_path": "source/src/index.ts:76-95 tool listing and :175-218 CallToolRequestSchema handler",
+    "sink_readback": "The formattedItems[0].title value in the get_items JSON Tool result; the shared Host projects the exact same role=tool content into model.next_request",
+    "tool": "get_items",
+    "tool_arguments": {
+      "url": "http://[::1]:18081/gh-p5-045-controlled-feed"
+    },
+    "vulnerability_derived_state": "GH_P5_045_PROXY_FEED_READBACK, a feed title emitted only by the controlled proxy boundary and absent from the frozen input",
+    "vulnerability_path": "MCP get_items(url) -> fetchRssItems -> vulnerable Axios NO_PROXY normalization bypass for IPv6 loopback -> configured local HTTP proxy response -> rss-parser feed title -> formatted get_items Tool result"
+  },
+  "runner": {
+    "startup": "python3 /opt/gt/run_gh_p5_045.py --spec /opt/gt/case_spec.json --output /opt/output --side vulnerable|fixed --repetition 1..3",
+    "timeout_seconds": 45
+  },
+  "schema_version": "github-direct-case-spec/v1",
+  "vulnerability": {
+    "advisory_url": "https://api.osv.dev/v1/vulns/GHSA-3p68-rc4w-qgx5",
+    "affected_range": "axios >=1.0.0 <1.15.0",
+    "aliases": [
+      "CVE-2025-62718"
+    ],
+    "effect_type": "SSRF_WITH_RESPONSE_OR_METADATA",
+    "fixed_version": "1.15.0",
+    "id": "GHSA-3p68-rc4w-qgx5",
+    "summary": "Axios NO_PROXY hostname normalization bypass can route a protected loopback request through a configured proxy and expose the proxy response."
+  }
+}

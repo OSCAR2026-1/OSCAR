@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "url-text-fetcher"
+version = "0.1.0"
+description = "FastMCP server for URL text fetching"
+authors = [{ name = "Evgeny Igumnov", email = "igumnovnsk@gmail.com" }]
+dependencies = [
+  "fastmcp",
+  "requests",
+  "beautifulsoup4",
+]
+
+[project.scripts]
+url-text-fetcher = "url_text_fetcher.mcp_server:main"
+

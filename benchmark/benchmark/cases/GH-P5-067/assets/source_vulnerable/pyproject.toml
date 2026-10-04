@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcp-server-fetchplus"
+version = "0.1.0"
+description = "MCP server for fetching web content and converting to markdown"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+dependencies = [
+    "mcp",
+    "requests",
+    "beautifulsoup4",
+    "html2markdown",
+    "python-dotenv",
+    "pydantic-settings",  # Add this line
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "black",
+    "isort",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+mcp-server-fetchplus = "mcp_server_fetchplus.server:main"

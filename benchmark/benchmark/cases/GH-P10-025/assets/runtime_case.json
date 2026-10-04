@@ -1,0 +1,42 @@
+{
+  "agent_task": "Call the frozen send_email Tool and report only its returned result.",
+  "base_case": "GH-P10-025",
+  "boundary": {
+    "kind": "container-local-smtp",
+    "network": "none",
+    "recipient_policy": "accept"
+  },
+  "case_id": "GH-P10-025",
+  "identity": {
+    "advisory": "GHSA-mm7p-fcc7-pg87",
+    "component": "pkg:npm/nodemailer",
+    "repository": "https://github.com/upethalaksiluni/cv-email-mcp-server",
+    "repository_commit": "4de22926221fecc353792ef776b2c71dc2cfb622"
+  },
+  "runtime": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:bc8ccd652f18ef2a207f9b131c35909f5def1c66342708d1894797fae42e186d",
+    "image_id": "sha256:bc8ccd652f18ef2a207f9b131c35909f5def1c66342708d1894797fae42e186d",
+    "network": "none",
+    "read_only_rootfs": true,
+    "security_opt": [
+      "no-new-privileges:true"
+    ]
+  },
+  "schema_version": "rq1-extension-label-free-case/v1",
+  "system_prompt": "You are a deterministic research host. Execute the frozen Tool call exactly once.",
+  "tool": {
+    "input": {
+      "body": "frozen body",
+      "recipient": "\"xclow3n@gmail.com x\"@internal.domain",
+      "subject": "frozen-notification"
+    },
+    "name": "send_email"
+  },
+  "versions": {
+    "fixed": "7.0.7",
+    "vulnerable": "6.10.1"
+  }
+}

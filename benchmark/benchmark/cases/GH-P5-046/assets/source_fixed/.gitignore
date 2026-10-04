@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+*.tmp
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+url_text_fetcher.egg-info/
+
+# IDE/editor
+.vscode/
+.idea/
+
+# macOS
+.DS_Store

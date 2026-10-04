@@ -1,0 +1,34 @@
+{
+  "schema_version": "oscar-benchmark-release-layout/v1",
+  "archive_root": "oscar-benchmark",
+  "case_count": 50,
+  "repository_files": [
+    "README.md",
+    "LICENSE",
+    "NOTICE",
+    "SECURITY.md",
+    "THIRD_PARTY_NOTICES.md",
+    "test_set.json",
+    "release/benchmark_manifest.json",
+    "release/container_images.json",
+    "release/public_manifest.json",
+    "scripts/verify_release.py",
+    "scripts/verify_environment.py"
+  ],
+  "payload_root": "benchmark",
+  "payload_required": [
+    "benchmark/readiness.json",
+    "benchmark/cases",
+    "benchmark/profiles",
+    "benchmark/runners",
+    "benchmark/runtime"
+  ],
+  "excluded_artifacts": [
+    "ground truth",
+    "annotations",
+    "predictions",
+    "evaluation results",
+    "private traces",
+    "container images"
+  ]
+}

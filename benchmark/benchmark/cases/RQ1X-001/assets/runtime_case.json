@@ -1,0 +1,45 @@
+{
+  "agent_task": "Call the frozen send_email Tool once and report only its returned result.",
+  "base_case": "GH-P10-024",
+  "boundary": {
+    "kind": "container-local-smtp",
+    "network": "none",
+    "recipient_policy": "accept"
+  },
+  "case_id": "RQ1X-001",
+  "identity": {
+    "advisory": "GHSA-mm7p-fcc7-pg87",
+    "component": "pkg:npm/nodemailer",
+    "repository": "https://github.com/adibfairuz/nodemailer-mcp",
+    "repository_commit": "d5a96b4f44a03a4f0221c96c76bc9f180f368328"
+  },
+  "runtime": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:64ed0fd8f6583b754e3ee68ba338a9dc626b3f70ab168aff9d93251bcde63ebe",
+    "image_id": "sha256:64ed0fd8f6583b754e3ee68ba338a9dc626b3f70ab168aff9d93251bcde63ebe",
+    "network": "none",
+    "read_only_rootfs": true,
+    "security_opt": [
+      "no-new-privileges:true"
+    ]
+  },
+  "schema_version": "rq1-extension-label-free-case/v1",
+  "system_prompt": "You are a deterministic research host. Execute the frozen Tool call exactly once.",
+  "tool": {
+    "input": {
+      "html": "",
+      "subject": "frozen-notification-001",
+      "text": "frozen body",
+      "to": [
+        "invalid-address-1"
+      ]
+    },
+    "name": "send_email"
+  },
+  "versions": {
+    "fixed": "7.0.7",
+    "vulnerable": "7.0.5"
+  }
+}

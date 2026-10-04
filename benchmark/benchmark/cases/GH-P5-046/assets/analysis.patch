@@ -1,0 +1,99 @@
+--- a/__version__.py
++++ b/__version__.py
+@@ -5,8 +5,8 @@
+ __title__ = "requests"
+ __description__ = "Python HTTP for Humans."
+ __url__ = "https://requests.readthedocs.io"
+-__version__ = "2.32.3"
+-__build__ = 0x023203
++__version__ = "2.32.4"
++__build__ = 0x023204
+ __author__ = "Kenneth Reitz"
+ __author_email__ = "me@kennethreitz.org"
+ __license__ = "Apache-2.0"
+--- a/compat.py
++++ b/compat.py
+@@ -9,6 +9,18 @@
+ 
+ import importlib
+ import sys
++
++# -------
++# urllib3
++# -------
++from urllib3 import __version__ as urllib3_version
++
++# Detect which major version of urllib3 is being used.
++try:
++    is_urllib3_1 = int(urllib3_version.split(".")[0]) == 1
++except (TypeError, AttributeError):
++    # If we can't discern a version, prefer old functionality.
++    is_urllib3_1 = True
+ 
+ # -------------------
+ # Character Detection
+--- a/models.py
++++ b/models.py
+@@ -945,7 +945,9 @@
+         return content
+ 
+     def json(self, **kwargs):
+-        r"""Returns the json-encoded content of a response, if any.
++        r"""Decodes the JSON response body (if any) as a Python object.
++
++        This may return a dictionary, list, etc. depending on what is in the response.
+ 
+         :param \*\*kwargs: Optional arguments that ``json.loads`` takes.
+         :raises requests.exceptions.JSONDecodeError: If the response body does not
+--- a/utils.py
++++ b/utils.py
+@@ -38,6 +38,7 @@
+     getproxies,
+     getproxies_environment,
+     integer_types,
++    is_urllib3_1,
+ )
+ from .compat import parse_http_list as _parse_list_header
+ from .compat import (
+@@ -136,7 +137,9 @@
+     total_length = None
+     current_position = 0
+ 
+-    if isinstance(o, str):
++    if not is_urllib3_1 and isinstance(o, str):
++        # urllib3 2.x+ treats all strings as utf-8 instead
++        # of latin-1 (iso-8859-1) like http.client.
+         o = o.encode("utf-8")
+ 
+     if hasattr(o, "__len__"):
+@@ -216,14 +219,7 @@
+         netrc_path = None
+ 
+         for f in netrc_locations:
+-            try:
+-                loc = os.path.expanduser(f)
+-            except KeyError:
+-                # os.path.expanduser can fail when $HOME is undefined and
+-                # getpwuid fails. See https://bugs.python.org/issue20164 &
+-                # https://github.com/psf/requests/issues/1846
+-                return
+-
++            loc = os.path.expanduser(f)
+             if os.path.exists(loc):
+                 netrc_path = loc
+                 break
+@@ -233,13 +229,7 @@
+             return
+ 
+         ri = urlparse(url)
+-
+-        # Strip port numbers from netloc. This weird `if...encode`` dance is
+-        # used for Python 3.2, which doesn't support unicode literals.
+-        splitstr = b":"
+-        if isinstance(url, str):
+-            splitstr = splitstr.decode("ascii")
+-        host = ri.netloc.split(splitstr)[0]
++        host = ri.hostname
+ 
+         try:
+             _netrc = netrc(netrc_path).authenticators(host)

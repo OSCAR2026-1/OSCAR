@@ -1,0 +1,7 @@
+{
+  "profile_id": "rq1-evaluation-sanitized-projection/v1",
+  "projection": {
+    "kind": "credential_redaction"
+  },
+  "schema_version": "rq1-label-free-host-profile/v1"
+}

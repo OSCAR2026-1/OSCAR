@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "datris-mcp-server"
+version = "1.38.0"
+description = "MCP server for AI-driven data pipeline operations — ingest, validate, transform, analyze, and query data. Tools covering ETL, AI data quality, vector search, PostgreSQL, MongoDB, Snowflake, Databricks, Kafka, S3/MinIO, HashiCorp Vault, Qdrant, Weaviate, Milvus, Chroma, pgvector."
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.10"
+authors = [
+    {name = "Datris", email = "info@datris.ai"}
+]
+keywords = ["mcp", "datris", "data-platform", "ai-agent", "model-context-protocol", "etl", "data-quality", "vector-search", "postgresql", "mongodb", "snowflake", "databricks", "kafka", "qdrant", "weaviate", "milvus", "chroma", "pgvector", "minio", "hashicorp-vault"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Database",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    # Same pin as requirements.txt: mcp 2.x removed the Server.list_resources/
+    # list_tools decorator API this server is written against.
+    "mcp[cli]>=1.28,<2",
+    "requests",
+    "click",
+    "httpx",
+    "httpx-sse",
+    "python-dotenv",
+    "uvicorn",
+    "starlette",
+]
+
+[project.urls]
+Homepage = "https://datris.ai"
+Repository = "https://github.com/datris/datris-platform-oss"
+Documentation = "https://docs.datris.ai/mcp-server"
+Issues = "https://github.com/datris/datris-platform-oss/issues"
+
+[project.scripts]
+datris-mcp-server = "server:main"
+datris = "cli:main"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["server.py", "cli.py", "doctor.py"]
+sources = ["."]
+
+[tool.hatch.build.targets.sdist]
+only-include = ["server.py", "cli.py", "doctor.py", "pyproject.toml", "README.md"]

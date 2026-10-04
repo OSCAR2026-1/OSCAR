@@ -1,0 +1,28 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# Runtime and generated experiment outputs.
+working_artifacts/
+runs/
+predictions.jsonl
+prediction.json
+environment_manifest.json
+blind_evidence.jsonl
+recorder.jsonl
+run_summary.json
+plan.json
+graph_validation.json
+cross_layer_graph.json
+effect_model.json
+localization.json
+stage2_readiness_report.json
+
+# Hidden labels must never be published with the blind tool.
+tests/e2e_cases/hidden_gt.json
+**/hidden_gt.json

@@ -1,0 +1,235 @@
+{
+  "agent_task": {
+    "text": "Call the frozen setup_workspace Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "6dbd5e68d50c3f8cc02291aa789b7876d84843e1ed731ae30f68ca710d03c827"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "28cb0b08ff282975840d3b71fa517565e57976f488becc6f98f06e891fb186aa"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "9305cee708a508286480003c53d8bbdd71c0b85be405113075008c1239f8da1f"
+    }
+  },
+  "case_id": "GH-P4-002",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:a9da1e26a61fa1c9b19a7afdc5f18e37e7d859a386cee3b3dff3e76fcddd5761",
+    "image_id": "sha256:a9da1e26a61fa1c9b19a7afdc5f18e37e7d859a386cee3b3dff3e76fcddd5761",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "f9009fe0b0aa7fd1f41ec4b2ea228d67fbe9580618b33ecb79c700750401162a",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {
+      "async_mode": false,
+      "name": "gh-p4-002-workspace",
+      "repos": [
+        "attacker-org/$GT_AGENT_SECRET"
+      ],
+      "skip_preflight": true,
+      "workspace_root": "/tmp/gt-workspaces"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "CVE-2026-67322",
+    "advisory_url": "https://osv.dev/vulnerability/CVE-2026-67322",
+    "component_name": "GitPython",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:pypi/gitpython",
+    "fixed_version": "3.1.52",
+    "patch_url": "https://github.com/GitPython/GitPython/compare/v3.1.51...v3.1.52",
+    "repository_url": "https://github.com/abhishek3059/multi-repository-mcp",
+    "source_commit": "7c0bc69d759c7fda11dac7ec0c753c6e76aaa417",
+    "vulnerable_version": "3.1.51"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P4-002.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P4-002/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p4_002.py:/opt/gt/run_gh_p4_002.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/github.crt_fixed:/opt/gt/certs/github.crt:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/github.key_fixed:/opt/gt/certs/github.key:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/source_fixed:/workspace/source/src/multi_repo_mcp:ro",
+        "sha256:a9da1e26a61fa1c9b19a7afdc5f18e37e7d859a386cee3b3dff3e76fcddd5761",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p4_002.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P4-002.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P4-002/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p4_002.py:/opt/gt/run_gh_p4_002.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/github.crt_vulnerable:/opt/gt/certs/github.crt:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/github.key_vulnerable:/opt/gt/certs/github.key:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/source_vulnerable:/workspace/source/src/multi_repo_mcp:ro",
+        "sha256:a9da1e26a61fa1c9b19a7afdc5f18e37e7d859a386cee3b3dff3e76fcddd5761",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p4_002.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "6191b919b7d906570ffda080fd7580e0a555c7ba03e1bbcddcbec87a34b83d3a",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "6191b919b7d906570ffda080fd7580e0a555c7ba03e1bbcddcbec87a34b83d3a"
+  },
+  "tool": {
+    "name": "setup_workspace",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "async_mode": false,
+        "name": "gh-p4-002-workspace",
+        "repos": [
+          "attacker-org/$GT_AGENT_SECRET"
+        ],
+        "skip_preflight": true,
+        "workspace_root": "/tmp/gt-workspaces"
+      },
+      "name": "setup_workspace"
+    }
+  ]
+}

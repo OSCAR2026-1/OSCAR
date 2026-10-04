@@ -1,0 +1,369 @@
+--- a/_utils/module_testing/module_testing_utils.py
++++ b/_utils/module_testing/module_testing_utils.py
+@@ -62,6 +62,24 @@
+     assert log_entry["transactionHash"] == HexBytes(txn_hash_with_log)
+ 
+ 
++def _mock_getaddrinfo_public(
++    monkeypatch: "MonkeyPatch",
++) -> None:
++    # Patch socket.getaddrinfo to return a public IP for CCIP test domains
++    # so that CCIP URL host validation passes during tests. Pass through
++    # to the real getaddrinfo for all other hosts (e.g. 127.0.0.1 for geth).
++    import socket as _socket
++
++    _original_getaddrinfo = _socket.getaddrinfo
++
++    def _patched_getaddrinfo(host: Any, port: Any, *args: Any, **kwargs: Any) -> Any:
++        if host == "web3.py":
++            return [(_socket.AF_INET, _socket.SOCK_STREAM, 0, "", ("1.2.3.4", 0))]
++        return _original_getaddrinfo(host, port, *args, **kwargs)
++
++    monkeypatch.setattr("socket.getaddrinfo", _patched_getaddrinfo)
++
++
+ def mock_offchain_lookup_request_response(
+     monkeypatch: "MonkeyPatch",
+     http_method: Literal["GET", "POST"] = "GET",
+@@ -73,6 +91,8 @@
+     sender: str = None,
+     calldata: str = None,
+ ) -> None:
++    _mock_getaddrinfo_public(monkeypatch)
++
+     class MockedResponse:
+         status_code = mocked_status_code
+ 
+@@ -92,6 +112,7 @@
+         # mock response only to specified url while validating appropriate fields
+         if url_from_args == mocked_request_url:
+             assert kwargs["timeout"] == DEFAULT_HTTP_TIMEOUT
++            assert kwargs.get("allow_redirects") is False
+             if http_method.upper() == "POST":
+                 assert kwargs["json"] == {"data": calldata, "sender": sender}
+             return MockedResponse()
+@@ -119,6 +140,8 @@
+     sender: str = None,
+     calldata: str = None,
+ ) -> None:
++    _mock_getaddrinfo_public(monkeypatch)
++
+     class AsyncMockedResponse:
+         status = mocked_status_code
+ 
+@@ -142,6 +165,7 @@
+         # mock response only to specified url while validating appropriate fields
+         if url_from_args == mocked_request_url:
+             assert kwargs["timeout"] == ClientTimeout(DEFAULT_HTTP_TIMEOUT)
++            assert kwargs.get("allow_redirects") is False
+             if http_method.upper() == "POST":
+                 assert kwargs["json"] == {"data": calldata, "sender": sender}
+             return AsyncMockedResponse()
+--- a/eth/async_eth.py
++++ b/eth/async_eth.py
+@@ -289,6 +289,8 @@
+                 durin_calldata = await async_handle_offchain_lookup(
+                     offchain_lookup.payload,
+                     transaction,
++                    allow_http=self.w3.provider.ccip_read_allow_http,
++                    url_validator=self.w3.provider.ccip_read_url_validator,
+                 )
+                 transaction["data"] = durin_calldata
+ 
+--- a/eth/eth.py
++++ b/eth/eth.py
+@@ -268,6 +268,8 @@
+                 durin_calldata = handle_offchain_lookup(
+                     offchain_lookup.payload,
+                     transaction,
++                    allow_http=self.w3.provider.ccip_read_allow_http,
++                    url_validator=self.w3.provider.ccip_read_url_validator,
+                 )
+                 transaction["data"] = durin_calldata
+ 
+--- a/providers/async_base.py
++++ b/providers/async_base.py
+@@ -68,6 +68,9 @@
+     from web3.providers.persistent import (  # noqa: F401
+         RequestProcessor,
+     )
++    from web3.utils.ccip_url_validation import (
++        AsyncCcipUrlValidator,
++    )
+ 
+ 
+ class AsyncBaseProvider:
+@@ -83,6 +86,8 @@
+     has_persistent_connection = False
+     global_ccip_read_enabled: bool = True
+     ccip_read_max_redirects: int = 4
++    ccip_read_allow_http: bool = False
++    ccip_read_url_validator: "AsyncCcipUrlValidator | None" = None
+ 
+     def __init__(
+         self,
+--- a/providers/base.py
++++ b/providers/base.py
+@@ -54,6 +54,9 @@
+     from web3._utils.batching import (
+         RequestBatcher,
+     )
++    from web3.utils.ccip_url_validation import (
++        CcipUrlValidator,
++    )
+ 
+ 
+ class BaseProvider:
+@@ -69,6 +72,8 @@
+     has_persistent_connection = False
+     global_ccip_read_enabled: bool = True
+     ccip_read_max_redirects: int = 4
++    ccip_read_allow_http: bool = False
++    ccip_read_url_validator: "CcipUrlValidator | None" = None
+ 
+     def __init__(
+         self,
+--- a/utils/__init__.py
++++ b/utils/__init__.py
+@@ -39,6 +39,10 @@
+     RequestCacheValidationThreshold,
+     SimpleCache,
+ )
++from .ccip_url_validation import (
++    AsyncCcipUrlValidator,
++    CcipUrlValidator,
++)
+ from .exception_handling import (
+     handle_offchain_lookup,
+ )
+@@ -73,6 +77,8 @@
+     "async_handle_offchain_lookup",
+     "RequestCacheValidationThreshold",
+     "SimpleCache",
++    "AsyncCcipUrlValidator",
++    "CcipUrlValidator",
+     "EthSubscription",
+     "handle_offchain_lookup",
+ ]
+--- a/utils/async_exception_handling.py
++++ b/utils/async_exception_handling.py
+@@ -1,6 +1,7 @@
+ from typing import (
+     Any,
+     Dict,
++    Optional,
+ )
+ 
+ from aiohttp import (
+@@ -28,11 +29,18 @@
+ from web3.types import (
+     TxParams,
+ )
++from web3.utils.ccip_url_validation import (
++    AsyncCcipUrlValidator,
++    async_validate_ccip_url_host,
++    validate_ccip_url_scheme,
++)
+ 
+ 
+ async def async_handle_offchain_lookup(
+     offchain_lookup_payload: Dict[str, Any],
+     transaction: TxParams,
++    allow_http: bool = False,
++    url_validator: Optional[AsyncCcipUrlValidator] = None,
+ ) -> bytes:
+     formatted_sender = to_hex_if_bytes(offchain_lookup_payload["sender"]).lower()
+     formatted_data = to_hex_if_bytes(offchain_lookup_payload["callData"]).lower()
+@@ -52,15 +60,26 @@
+         )
+ 
+         try:
++            validate_ccip_url_scheme(formatted_url, allow_http=allow_http)
++            await async_validate_ccip_url_host(formatted_url)
++            if url_validator is not None:
++                await url_validator(formatted_url)
++        except Web3ValidationError:
++            continue
++
++        try:
+             if "{data}" in url and "{sender}" in url:
+                 response = await session.get(
+-                    formatted_url, timeout=ClientTimeout(DEFAULT_HTTP_TIMEOUT)
++                    formatted_url,
++                    timeout=ClientTimeout(DEFAULT_HTTP_TIMEOUT),
++                    allow_redirects=False,
+                 )
+             else:
+                 response = await session.post(
+                     formatted_url,
+                     json={"data": formatted_data, "sender": formatted_sender},
+                     timeout=ClientTimeout(DEFAULT_HTTP_TIMEOUT),
++                    allow_redirects=False,
+                 )
+         except Exception:
+             continue  # try next url if timeout or issues making the request
+--- a/utils/ccip_url_validation.py
++++ b/utils/ccip_url_validation.py
+@@ -0,0 +1,105 @@
++import asyncio
++import ipaddress
++import socket
++from typing import (
++    Awaitable,
++    Callable,
++)
++from urllib.parse import (
++    urlparse,
++)
++
++from web3.exceptions import (
++    Web3ValidationError,
++)
++
++CcipUrlValidator = Callable[[str], None]
++AsyncCcipUrlValidator = Callable[[str], Awaitable[None]]
++
++BLOCKED_IP_NETWORKS = [
++    ipaddress.ip_network("127.0.0.0/8"),
++    ipaddress.ip_network("10.0.0.0/8"),
++    ipaddress.ip_network("172.16.0.0/12"),
++    ipaddress.ip_network("192.168.0.0/16"),
++    ipaddress.ip_network("169.254.0.0/16"),
++    ipaddress.ip_network("0.0.0.0/8"),
++    ipaddress.ip_network("::1/128"),
++    ipaddress.ip_network("fe80::/10"),
++    ipaddress.ip_network("fc00::/7"),
++    ipaddress.ip_network("::/128"),
++]
++
++
++def validate_ccip_url_scheme(url: str, allow_http: bool = False) -> None:
++    parsed = urlparse(url)
++    scheme = parsed.scheme.lower()
++
++    if scheme == "https":
++        return
++
++    if scheme == "http" and allow_http:
++        return
++
++    if scheme == "http":
++        raise Web3ValidationError(
++            f"CCIP Read request to non-HTTPS URL '{url}' is not allowed. "
++            "Set ``ccip_read_allow_http=True`` on the provider to allow HTTP URLs."
++        )
++
++    raise Web3ValidationError(
++        f"CCIP Read request with scheme '{scheme}' is not allowed. "
++        "Only HTTPS URLs are permitted."
++    )
++
++
++def _check_ip_blocked(ip_str: str) -> bool:
++    try:
++        addr = ipaddress.ip_address(ip_str)
++    except ValueError:
++        return False
++    return any(addr in network for network in BLOCKED_IP_NETWORKS)
++
++
++def validate_ccip_url_host(url: str) -> None:
++    parsed = urlparse(url)
++    hostname = parsed.hostname
++    if not hostname:
++        raise Web3ValidationError(f"CCIP Read URL '{url}' has no hostname.")
++
++    try:
++        addrinfos = socket.getaddrinfo(hostname, None)
++    except socket.gaierror:
++        raise Web3ValidationError(
++            f"CCIP Read URL hostname '{hostname}' could not be resolved."
++        )
++
++    for addrinfo in addrinfos:
++        ip_str = str(addrinfo[4][0])
++        if _check_ip_blocked(ip_str):
++            raise Web3ValidationError(
++                f"CCIP Read request to '{url}' is not allowed: "
++                f"resolved IP '{ip_str}' is in a blocked private/reserved range."
++            )
++
++
++async def async_validate_ccip_url_host(url: str) -> None:
++    parsed = urlparse(url)
++    hostname = parsed.hostname
++    if not hostname:
++        raise Web3ValidationError(f"CCIP Read URL '{url}' has no hostname.")
++
++    loop = asyncio.get_running_loop()
++    try:
++        addrinfos = await loop.run_in_executor(None, socket.getaddrinfo, hostname, None)
++    except socket.gaierror:
++        raise Web3ValidationError(
++            f"CCIP Read URL hostname '{hostname}' could not be resolved."
++        )
++
++    for addrinfo in addrinfos:
++        ip_str = str(addrinfo[4][0])
++        if _check_ip_blocked(ip_str):
++            raise Web3ValidationError(
++                f"CCIP Read request to '{url}' is not allowed: "
++                f"resolved IP '{ip_str}' is in a blocked private/reserved range."
++            )
+--- a/utils/exception_handling.py
++++ b/utils/exception_handling.py
+@@ -1,6 +1,7 @@
+ from typing import (
+     Any,
+     Dict,
++    Optional,
+ )
+ 
+ from eth_abi import (
+@@ -25,11 +26,18 @@
+ from web3.types import (
+     TxParams,
+ )
++from web3.utils.ccip_url_validation import (
++    CcipUrlValidator,
++    validate_ccip_url_host,
++    validate_ccip_url_scheme,
++)
+ 
+ 
+ def handle_offchain_lookup(
+     offchain_lookup_payload: Dict[str, Any],
+     transaction: TxParams,
++    allow_http: bool = False,
++    url_validator: Optional[CcipUrlValidator] = None,
+ ) -> bytes:
+     formatted_sender = to_hex_if_bytes(offchain_lookup_payload["sender"]).lower()
+     formatted_data = to_hex_if_bytes(offchain_lookup_payload["callData"]).lower()
+@@ -49,13 +57,26 @@
+         )
+ 
+         try:
++            validate_ccip_url_scheme(formatted_url, allow_http=allow_http)
++            validate_ccip_url_host(formatted_url)
++            if url_validator is not None:
++                url_validator(formatted_url)
++        except Web3ValidationError:
++            continue
++
++        try:
+             if "{data}" in url and "{sender}" in url:
+-                response = session.get(formatted_url, timeout=DEFAULT_HTTP_TIMEOUT)
++                response = session.get(
++                    formatted_url,
++                    timeout=DEFAULT_HTTP_TIMEOUT,
++                    allow_redirects=False,
++                )
+             else:
+                 response = session.post(
+                     formatted_url,
+                     json={"data": formatted_data, "sender": formatted_sender},
+                     timeout=DEFAULT_HTTP_TIMEOUT,
++                    allow_redirects=False,
+                 )
+         except Exception:
+             continue  # try next url if timeout or issues making the request

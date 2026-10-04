@@ -1,0 +1,211 @@
+{
+  "agent_task": {
+    "text": "Call the frozen get_items Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "ce3354945f8fe60e791f0bcb52bc84be4d859e21577139298b5cb23c8458b4e4"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "9884c5daa29ca3246c8c05178b96f0f83e5ee4ac920d5c595caf152bedf2676c"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "f8156f9c47ac7000b5a9f0e8e7e6cc28ccc9348ffd699cffbccf5bb6d2e16982"
+    }
+  },
+  "case_id": "GH-P5-045",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:e7a896df5695f0de47d6cc04de2b4d962e6a7ff85965f500ab1f699bc9893eff",
+    "image_id": "sha256:e7a896df5695f0de47d6cc04de2b4d962e6a7ff85965f500ab1f699bc9893eff",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "4bed7fcba34a3d2abd08fa4d59d4b888383b35d63fb9fa8b31a7f40e5d49a411",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {
+      "url": "http://[::1]:18081/gh-p5-045-controlled-feed"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-3p68-rc4w-qgx5",
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-3p68-rc4w-qgx5",
+    "component_name": "axios",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:npm/axios",
+    "fixed_version": "1.15.0",
+    "patch_url": "https://github.com/axios/axios/compare/v1.14.0...v1.15.0",
+    "repository_url": "https://github.com/tanevanwifferen/rss-reader-server",
+    "source_commit": "703fec11de1c3232bc223922aa4e67a8e4e172ea",
+    "vulnerable_version": "1.14.0"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P5-045.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P5-045/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p5_045.py:/opt/gt/run_gh_p5_045.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "sha256:e7a896df5695f0de47d6cc04de2b4d962e6a7ff85965f500ab1f699bc9893eff",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p5_045.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P5-045.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P5-045/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p5_045.py:/opt/gt/run_gh_p5_045.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "sha256:e7a896df5695f0de47d6cc04de2b4d962e6a7ff85965f500ab1f699bc9893eff",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p5_045.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "9412d2232dd63c72c0f30966fafef07d50f050acbd63a43a71056d746ad83aca",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "9412d2232dd63c72c0f30966fafef07d50f050acbd63a43a71056d746ad83aca"
+  },
+  "tool": {
+    "name": "get_items",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "url": "http://[::1]:18081/gh-p5-045-controlled-feed"
+      },
+      "name": "get_items"
+    }
+  ]
+}

@@ -1,0 +1,204 @@
+{
+  "schema_version": "oscar-benchmark-container-contract/v1",
+  "image_count": 21,
+  "images_included": false,
+  "images": [
+    {
+      "image": "sha256:86266e4906d4009ef3662918a8a6824dd7a301829d141c9bee8a5d492bbf43dc",
+      "image_id": "sha256:86266e4906d4009ef3662918a8a6824dd7a301829d141c9bee8a5d492bbf43dc",
+      "case_count": 1,
+      "case_ids": [
+        "CVE-2024-47081-zilliz"
+      ]
+    },
+    {
+      "image": "sha256:a0f00ef75e5801fe78bdd814b39257f27f5b3de606f95b3544d44a51510257b8",
+      "image_id": "sha256:a0f00ef75e5801fe78bdd814b39257f27f5b3de606f95b3544d44a51510257b8",
+      "case_count": 3,
+      "case_ids": [
+        "CVE-2022-33987",
+        "CVE-2025-62718-markdown",
+        "CVE-2025-62718-sun-image"
+      ]
+    },
+    {
+      "image": "sha256:a9da1e26a61fa1c9b19a7afdc5f18e37e7d859a386cee3b3dff3e76fcddd5761",
+      "image_id": "sha256:a9da1e26a61fa1c9b19a7afdc5f18e37e7d859a386cee3b3dff3e76fcddd5761",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P4-002"
+      ]
+    },
+    {
+      "image": "sha256:78dc99380404ee3a32a452f60b24aca84271439c5dc6969d32ca6694ced98f33",
+      "image_id": "sha256:78dc99380404ee3a32a452f60b24aca84271439c5dc6969d32ca6694ced98f33",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P2-002"
+      ]
+    },
+    {
+      "image": "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+      "image_id": "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P3-009-rest-mcp-requests-netrc"
+      ]
+    },
+    {
+      "image": "sha256:41a5246af35aeb67b7f61a2fd2a45fd15f16060c34f20a947147e9927bba3efa",
+      "image_id": "sha256:41a5246af35aeb67b7f61a2fd2a45fd15f16060c34f20a947147e9927bba3efa",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P3-032-fetch-guard-requests-netrc"
+      ]
+    },
+    {
+      "image": "sha256:04493e549fad19e18a664521a69fb4c798849423f563db236dfb9df000aec2b4",
+      "image_id": "sha256:04493e549fad19e18a664521a69fb4c798849423f563db236dfb9df000aec2b4",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P4-054"
+      ]
+    },
+    {
+      "image": "sha256:e7a896df5695f0de47d6cc04de2b4d962e6a7ff85965f500ab1f699bc9893eff",
+      "image_id": "sha256:e7a896df5695f0de47d6cc04de2b4d962e6a7ff85965f500ab1f699bc9893eff",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P5-045"
+      ]
+    },
+    {
+      "image": "sha256:e5fe753bc3640274bcb5544b52e181738cbc7ad1ce42e100b0ffab5356b6de51",
+      "image_id": "sha256:e5fe753bc3640274bcb5544b52e181738cbc7ad1ce42e100b0ffab5356b6de51",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P5-067"
+      ]
+    },
+    {
+      "image": "sha256:64ed0fd8f6583b754e3ee68ba338a9dc626b3f70ab168aff9d93251bcde63ebe",
+      "image_id": "sha256:64ed0fd8f6583b754e3ee68ba338a9dc626b3f70ab168aff9d93251bcde63ebe",
+      "case_count": 6,
+      "case_ids": [
+        "GH-P10-024",
+        "RQ1X-001",
+        "RQ1X-002",
+        "RQ1X-003",
+        "RQ1X-004",
+        "RQ1X-005"
+      ]
+    },
+    {
+      "image": "sha256:bc8ccd652f18ef2a207f9b131c35909f5def1c66342708d1894797fae42e186d",
+      "image_id": "sha256:bc8ccd652f18ef2a207f9b131c35909f5def1c66342708d1894797fae42e186d",
+      "case_count": 12,
+      "case_ids": [
+        "GH-P10-025",
+        "RQ1X-006",
+        "RQ1X-007",
+        "RQ1X-008",
+        "RQ1X-009",
+        "RQ1X-010",
+        "RQ1X-011",
+        "RQ1X-012",
+        "RQ1X-013",
+        "RQ1X-014",
+        "RQ1X-015",
+        "RQ1X-016"
+      ]
+    },
+    {
+      "image": "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+      "image_id": "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+      "case_count": 12,
+      "case_ids": [
+        "GH-P10-028",
+        "RQ1X-017",
+        "RQ1X-018",
+        "RQ1X-019",
+        "RQ1X-020",
+        "RQ1X-021",
+        "RQ1X-022",
+        "RQ1X-023",
+        "RQ1X-024",
+        "RQ1X-025",
+        "RQ1X-026",
+        "RQ1X-027"
+      ]
+    },
+    {
+      "image": "sha256:b58e91c8f3784ed3d5c97810992b2665853cff5a818aeb5b4d4d25c2476424a3",
+      "image_id": "sha256:b58e91c8f3784ed3d5c97810992b2665853cff5a818aeb5b4d4d25c2476424a3",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P5-071"
+      ]
+    },
+    {
+      "image": "sha256:4ef0ce53dd50c0961456b9dcd86e4a6da6ffa68c07af6c75727a5adaa833c8f1",
+      "image_id": "sha256:4ef0ce53dd50c0961456b9dcd86e4a6da6ffa68c07af6c75727a5adaa833c8f1",
+      "case_count": 1,
+      "case_ids": [
+        "CVE-2026-33989"
+      ]
+    },
+    {
+      "image": "sha256:12ecc8515a2ab20fb9142db1d65ff35830e81e3dd3c85600a770449bfe3fdb69",
+      "image_id": "sha256:12ecc8515a2ab20fb9142db1d65ff35830e81e3dd3c85600a770449bfe3fdb69",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P5-046"
+      ]
+    },
+    {
+      "image": "sha256:0743cec46450f7d544ccbf53f700b18bde0725b12f22fb51a95759586290c0da",
+      "image_id": "sha256:0743cec46450f7d544ccbf53f700b18bde0725b12f22fb51a95759586290c0da",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P15-067"
+      ]
+    },
+    {
+      "image": "sha256:dfd76913b13e47f5bab8906cfd3bdf14be39449a5553e5a44d0ab74a1eef8b1f",
+      "image_id": "sha256:dfd76913b13e47f5bab8906cfd3bdf14be39449a5553e5a44d0ab74a1eef8b1f",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P3-063-rss-mcp-axios-no-proxy"
+      ]
+    },
+    {
+      "image": "sha256:0aae61646d5f38a6f0185a99ea1c5310fd92b2b5c89ab6c6664118855b0c7580",
+      "image_id": "sha256:0aae61646d5f38a6f0185a99ea1c5310fd92b2b5c89ab6c6664118855b0c7580",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P3-093-datris-mcp-requests-netrc"
+      ]
+    },
+    {
+      "image": "sha256:5a8ac229fcc07029c660b8c4cf00009d050128bbe4ca546771bc5efea93731fc",
+      "image_id": "sha256:5a8ac229fcc07029c660b8c4cf00009d050128bbe4ca546771bc5efea93731fc",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P3-119-bitbucket-server-mcp-axios-no-proxy"
+      ]
+    },
+    {
+      "image": "sha256:0d96f2df0b31fe6dc5aaa953dd559482cd1040e1c3a8b1dedaab560f0065e634",
+      "image_id": "sha256:0d96f2df0b31fe6dc5aaa953dd559482cd1040e1c3a8b1dedaab560f0065e634",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P4-1101"
+      ]
+    },
+    {
+      "image": "sha256:40e7951c286925ccf1d5237f3294124acc8dfaa88e2771d4d98f7a4ae5fe4984",
+      "image_id": "sha256:40e7951c286925ccf1d5237f3294124acc8dfaa88e2771d4d98f7a4ae5fe4984",
+      "case_count": 1,
+      "case_ids": [
+        "GH-P4-111"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": "vulveil-effect-model/v3",
+  "status": "UNASSESSED",
+  "vulnerability_identity": {
+    "advisory": "CVE-CLI-FIXTURE-INSUFFICIENT",
+    "package": "fixture-package",
+    "vulnerable_version": "1.0.0",
+    "fixed_version": "1.0.1"
+  },
+  "anchor_candidates": [],
+  "repair_predicate": {
+    "schema_version": "vulveil-repair-predicate/v2",
+    "kind": "patch-scoped-repair-predicate",
+    "anchor_ids": [],
+    "patch_refs": [],
+    "conditions": [],
+    "checkers": [],
+    "path_constraints": [],
+    "blocking_obligations": [],
+    "classification_status": "UNRESOLVED",
+    "dynamic_checks": {},
+    "fixed_side_validation": {},
+    "fixed_side_blocked": null,
+    "conditions_added_or_changed": []
+  },
+  "effects": [],
+  "effect_relations": [],
+  "counterfactual_checks": [],
+  "fixed_side_blocked": null,
+  "modeling_reasons": [
+    "fixed source is missing",
+    "no structured source anchor maps to a changed patch hunk",
+    "patch has no parseable added/deleted hunk",
+    "unified patch diff is missing",
+    "vulnerability_component is required (legacy direct_runtime_dependency is accepted for compatibility)",
+    "vulnerable source is missing"
+  ],
+  "evidence_refs": []
+}

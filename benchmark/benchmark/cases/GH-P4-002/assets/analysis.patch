@@ -1,0 +1,132 @@
+--- a/__init__.py
++++ b/__init__.py
+@@ -86,7 +86,7 @@
+     "to_hex_sha",
+ ]
+ 
+-__version__ = '3.1.51'
++__version__ = '3.1.52'
+ 
+ from typing import Any, List, Optional, Sequence, TYPE_CHECKING, Tuple, Union
+ 
+--- a/cmd.py
++++ b/cmd.py
+@@ -903,29 +903,34 @@
+ 
+     @overload
+     @classmethod
+-    def polish_url(cls, url: str, is_cygwin: Literal[False] = ...) -> str: ...
++    def polish_url(cls, url: str, is_cygwin: Literal[False] = ..., expand_vars: bool = ...) -> str: ...
+ 
+     @overload
+     @classmethod
+-    def polish_url(cls, url: str, is_cygwin: Union[None, bool] = None) -> str: ...
++    def polish_url(cls, url: str, is_cygwin: Union[None, bool] = None, expand_vars: bool = True) -> str: ...
+ 
+     @classmethod
+-    def polish_url(cls, url: str, is_cygwin: Union[None, bool] = None) -> PathLike:
++    def polish_url(cls, url: str, is_cygwin: Union[None, bool] = None, expand_vars: bool = True) -> PathLike:
+         """Remove any backslashes from URLs to be written in config files.
+ 
+         Windows might create config files containing paths with backslashes, but git
+         stops liking them as it will escape the backslashes. Hence we undo the escaping
+         just to be sure.
++
++        :param expand_vars:
++            Expand environment variables and an initial ``~``. Disable this for values
++            obtained from an untrusted source, such as remote URLs.
+         """
+         if is_cygwin is None:
+             is_cygwin = cls.is_cygwin()
+ 
+         if is_cygwin:
+-            url = cygpath(url)
++            url = cygpath(url, expand_vars=expand_vars)
+         else:
+-            url = os.path.expandvars(url)
+-            if url.startswith("~"):
+-                url = os.path.expanduser(url)
++            if expand_vars:
++                url = os.path.expandvars(url)
++                if url.startswith("~"):
++                    url = os.path.expanduser(url)
+             url = url.replace("\\\\", "\\").replace("\\", "/")
+         return url
+ 
+--- a/repo/base.py
++++ b/repo/base.py
+@@ -1452,8 +1452,9 @@
+         if multi_options:
+             multi = shlex.split(" ".join(multi_options))
+ 
++        clone_url = Git.polish_url(url, expand_vars=False)
+         if not allow_unsafe_protocols:
+-            Git.check_unsafe_protocols(url)
++            Git.check_unsafe_protocols(clone_url)
+         if not allow_unsafe_options:
+             Git.check_unsafe_options(
+                 options=Git._option_candidates([], kwargs),
+@@ -1465,7 +1466,7 @@
+         proc = git.clone(
+             multi,
+             "--",
+-            Git.polish_url(url),
++            clone_url,
+             clone_path,
+             with_extended_output=True,
+             as_process=True,
+@@ -1505,7 +1506,7 @@
+         # escape the backslashes. Hence we undo the escaping just to be sure.
+         if repo.remotes:
+             with repo.remotes[0].config_writer as writer:
+-                writer.set_value("url", Git.polish_url(repo.remotes[0].url))
++                writer.set_value("url", Git.polish_url(repo.remotes[0].url, expand_vars=False))
+         # END handle remote repo
+         return repo
+ 
+--- a/util.py
++++ b/util.py
+@@ -382,13 +382,13 @@
+     return progs
+ 
+ 
+-def _cygexpath(drive: Optional[str], path: str) -> str:
++def _cygexpath(drive: Optional[str], path: str, expand_vars: bool = True) -> str:
+     if osp.isabs(path) and not drive:
+         # Invoked from `cygpath()` directly with `D:Apps\123`?
+         #  It's an error, leave it alone just slashes)
+         p = path  # convert to str if AnyPath given
+     else:
+-        p = path and osp.normpath(osp.expandvars(osp.expanduser(path)))
++        p = path and osp.normpath(osp.expandvars(osp.expanduser(path)) if expand_vars else path)
+         if osp.isabs(p):
+             if drive:
+                 # Confusing, maybe a remote system should expand vars.
+@@ -416,7 +416,7 @@
+ )
+ 
+ 
+-def cygpath(path: str) -> str:
++def cygpath(path: str, expand_vars: bool = True) -> str:
+     """Use :meth:`git.cmd.Git.polish_url` instead, that works on any environment."""
+     path = os.fspath(path)  # Ensure is str and not AnyPath.
+     # Fix to use Paths when 3.5 dropped. Or to be just str if only for URLs?
+@@ -424,12 +424,15 @@
+         for regex, parser, recurse in _cygpath_parsers:
+             match = regex.match(path)
+             if match:
+-                path = parser(*match.groups())
++                if parser is _cygexpath:
++                    path = parser(*match.groups(), expand_vars=expand_vars)
++                else:
++                    path = parser(*match.groups())
+                 if recurse:
+-                    path = cygpath(path)
++                    path = cygpath(path, expand_vars=expand_vars)
+                 break
+         else:
+-            path = _cygexpath(None, path)
++            path = _cygexpath(None, path, expand_vars=expand_vars)
+ 
+     return path
+ 

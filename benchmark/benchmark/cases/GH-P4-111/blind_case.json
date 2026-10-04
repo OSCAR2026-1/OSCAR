@@ -1,0 +1,229 @@
+{
+  "agent_task": {
+    "text": "Call the frozen read_contract Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "68058acfd1b5a28d300ec14a9ccd43cfb659445e6487013e88e662c3c7b65d47"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "0832302d189dd9500629a6c7dbebdb448db11793ba052c178895583075045980"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "d64266bb92c35780a5023657d9d5df4e2c586d0fefc71591b9b6109f09e86489"
+    }
+  },
+  "case_id": "GH-P4-111",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:40e7951c286925ccf1d5237f3294124acc8dfaa88e2771d4d98f7a4ae5fe4984",
+    "image_id": "sha256:40e7951c286925ccf1d5237f3294124acc8dfaa88e2771d4d98f7a4ae5fe4984",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "91f520deb7fed8ebcc1608c19e2b6439bdcc2ea60cebc7f5ef1e511edf366358",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {
+      "abi_fragment": "[{\"type\":\"function\",\"name\":\"read\",\"stateMutability\":\"view\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"string\"}]}]",
+      "args_json": "[]",
+      "block_identifier": "latest",
+      "chain_id": 1,
+      "contract_address": "0x0000000000000000000000000000000000000001",
+      "function_name": "read"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-8c7f7e7f0de4f74c",
+    "profile_sha256": "8c7f7e7f0de4f74c8b7e9e99251eea559f117e1194a257b384b6791e75563e0f"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-5hr4-253g-cpx2",
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-5hr4-253g-cpx2",
+    "component_name": "web3",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:pypi/web3",
+    "fixed_version": "7.15.0",
+    "patch_url": "https://github.com/web3/web3/compare/v7.14.1...v7.15.0",
+    "repository_url": "https://github.com/teardrop-ai/teardrop",
+    "source_commit": "31c944b60f872b40727bcb1b54741054b4f82f96",
+    "vulnerable_version": "7.14.1"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "marker.example:127.0.0.1",
+        "--add-host",
+        "attacker.example:127.0.0.1",
+        "--add-host",
+        "start.example:127.0.0.1",
+        "--add-host",
+        "destination.example:127.0.0.1",
+        "--add-host",
+        "proxy.example:127.0.0.1",
+        "--add-host",
+        "www.muckrock.com:127.0.0.1",
+        "--add-host",
+        "accounts.muckrock.com:127.0.0.1",
+        "--add-host",
+        "example.com:127.0.0.1",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "RQ1_HOST_PROFILE_SOURCE_SHA256=ea03299160fde39fd2fd20ae9abd5e9897898e9fc994e62447aa867a8f11661f",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P4-111.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p4_111.py:/opt/gt/run_gh_p4_111.py:ro",
+        "sha256:e7d7e35393f92412874d3b2793709242d9f0f647cdfd062fc4534fd415d9a111",
+        "python3",
+        "/opt/gt/run_gh_p4_111.py",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "marker.example:127.0.0.1",
+        "--add-host",
+        "attacker.example:127.0.0.1",
+        "--add-host",
+        "start.example:127.0.0.1",
+        "--add-host",
+        "destination.example:127.0.0.1",
+        "--add-host",
+        "proxy.example:127.0.0.1",
+        "--add-host",
+        "www.muckrock.com:127.0.0.1",
+        "--add-host",
+        "accounts.muckrock.com:127.0.0.1",
+        "--add-host",
+        "example.com:127.0.0.1",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "RQ1_HOST_PROFILE_SOURCE_SHA256=ea03299160fde39fd2fd20ae9abd5e9897898e9fc994e62447aa867a8f11661f",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P4-111.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p4_111.py:/opt/gt/run_gh_p4_111.py:ro",
+        "sha256:40e7951c286925ccf1d5237f3294124acc8dfaa88e2771d4d98f7a4ae5fe4984",
+        "python3",
+        "/opt/gt/run_gh_p4_111.py",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "35543603105403ad37db44309cc8f50a8fd1a7a21c87ea6fa127573a4132e079",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "35543603105403ad37db44309cc8f50a8fd1a7a21c87ea6fa127573a4132e079"
+  },
+  "tool": {
+    "name": "read_contract",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "abi_fragment": "[{\"type\":\"function\",\"name\":\"read\",\"stateMutability\":\"view\",\"inputs\":[],\"outputs\":[{\"name\":\"\",\"type\":\"string\"}]}]",
+        "args_json": "[]",
+        "block_identifier": "latest",
+        "chain_id": 1,
+        "contract_address": "0x0000000000000000000000000000000000000001",
+        "function_name": "read"
+      },
+      "name": "read_contract"
+    }
+  ]
+}

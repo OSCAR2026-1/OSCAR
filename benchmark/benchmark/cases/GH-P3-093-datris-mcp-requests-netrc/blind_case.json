@@ -1,0 +1,229 @@
+{
+  "agent_task": {
+    "text": "Call the frozen get_version Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "0582fe044c0c59c88e6f7db48aad3d70da9c365d27f66460adb427f97f8ec5d2"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "a50923d402d34c5671c8accf79b12dd45e410455ff3756b987270fb95916fe5a"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "ec04abee02c09e7d17a87af0b8d7a2c14c0b20a5189adb9a1eae0a4da98ebde3"
+    }
+  },
+  "case_id": "GH-P3-093-datris-mcp-requests-netrc",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:0aae61646d5f38a6f0185a99ea1c5310fd92b2b5c89ab6c6664118855b0c7580",
+    "image_id": "sha256:0aae61646d5f38a6f0185a99ea1c5310fd92b2b5c89ab6c6664118855b0c7580",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "ffe90427d35d1985fe2a755ac58f1e83054daa2c5eae16112cafd419773f88fe",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {}
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+    "advisory_semantics": {
+      "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+      "claims": [
+        {
+          "claim_id": "netrc-credential-third-party-transmission",
+          "effect_kind": "RESOURCE_EFFECT",
+          "effect_role": "TERMINAL",
+          "exact_quote": "leak .netrc credentials to third parties",
+          "object_kind": "http-credential-transmission",
+          "operation": "send",
+          "runtime_oracle": {
+            "effect_event_operation": "send",
+            "kind": "http-credential-provenance/v1"
+          }
+        }
+      ],
+      "review_method": "human-reviewed-public-advisory/v1",
+      "schema_version": "public-advisory-effect-semantics/v1",
+      "source_excerpt": "Requests vulnerable to .netrc credentials leak via malicious URLs\nDue to a URL parsing issue, Requests releases prior to 2.32.4 may leak .netrc credentials to third parties for specific maliciously-crafted URLs.",
+      "source_excerpt_sha256": "07872f4ddbe2d232c47ca3204be9cc177efa6e7d70f8c3656da18f3ef516fbee",
+      "source_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7"
+    },
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7",
+    "component_name": "requests",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:pypi/requests",
+    "fixed_version": "2.32.4",
+    "patch_url": "https://github.com/requests/requests/compare/v2.32.3...v2.32.4",
+    "repository_url": "https://github.com/datris/datris-platform-oss",
+    "source_commit": "13d774d1018e1c602123722ccb9a57538d5d684c",
+    "vulnerable_version": "2.32.3"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P3-093-datris-mcp-requests-netrc.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P3-093-datris-mcp-requests-netrc/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p3_093.py:/opt/gt/run_gh_p3_093.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "sha256:0aae61646d5f38a6f0185a99ea1c5310fd92b2b5c89ab6c6664118855b0c7580",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p3_093.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P3-093-datris-mcp-requests-netrc.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P3-093-datris-mcp-requests-netrc/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p3_093.py:/opt/gt/run_gh_p3_093.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "sha256:0aae61646d5f38a6f0185a99ea1c5310fd92b2b5c89ab6c6664118855b0c7580",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p3_093.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "d30a671fac1480e7e13cefcb38f85648e44b87f2279463be62c1363a3e540e46",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "d30a671fac1480e7e13cefcb38f85648e44b87f2279463be62c1363a3e540e46"
+  },
+  "tool": {
+    "name": "get_version",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {},
+      "name": "get_version"
+    }
+  ]
+}

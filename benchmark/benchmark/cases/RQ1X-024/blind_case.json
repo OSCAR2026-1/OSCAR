@@ -1,0 +1,217 @@
+{
+  "agent_task": {
+    "text": "Call the frozen send_email Tool once and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "c988d3dff92fc267953942339bfb43b6ddac5fb3acbf2a46cffa28c2aa3ef4de"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "9bfc0e5865a85f6855a5cdbc24d8b119206b49eda55c95814bf53b17a6def6f3"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "910156588b50f51ead6853f18370daa1ab20028abd5c6ea90ebe1e87f0deb345"
+    }
+  },
+  "case_id": "RQ1X-024",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+    "image_id": "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "e6840f3179e9cc0e35c79008f2dc90f6f9bca64965db8873784247c991ca683c",
+    "kind": "container-local-smtp"
+  },
+  "frozen_input": {
+    "arguments": {
+      "body": "frozen body",
+      "subject": "frozen-notification-024",
+      "to": "\"quoted24\"@internal.domain"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-mm7p-fcc7-pg87",
+    "advisory_semantics": {
+      "advisory_id": "GHSA-mm7p-fcc7-pg87",
+      "claims": [
+        {
+          "claim_id": "unintended-email-recipient-route",
+          "effect_kind": "RESOURCE_EFFECT",
+          "effect_role": "TERMINAL",
+          "exact_quote": "misrouting of email recipients",
+          "object_kind": "smtp-recipient-route",
+          "operation": "deliver",
+          "runtime_oracle": {
+            "effect_event_operation": "deliver",
+            "kind": "smtp-delivery-projection/v1"
+          }
+        }
+      ],
+      "review_method": "human-reviewed-public-advisory/v1",
+      "schema_version": "public-advisory-effect-semantics/v1",
+      "source_excerpt": "Nodemailer: Email to an unintended domain can occur due to Interpretation Conflict\nThe email parsing library incorrectly handles quoted local-parts containing @. This leads to misrouting of email recipients, where the parser extracts and routes to an unintended domain instead of the RFC-compliant target.",
+      "source_excerpt_sha256": "aedf133b3fe7cd68b0df7a6403a9b33b76d0ff75900b3936aeb8fc6406caba12",
+      "source_url": "https://osv.dev/vulnerability/GHSA-mm7p-fcc7-pg87"
+    },
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-mm7p-fcc7-pg87",
+    "component_name": "nodemailer",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:npm/nodemailer",
+    "fixed_version": "7.0.7",
+    "patch_url": "https://github.com/nodemailer/nodemailer/compare/v6.10.1...v7.0.7",
+    "repository_url": "https://github.com/amotivv/protonmail-mcp",
+    "source_commit": "fdca87e7a0615c21a2b7a4b411e39c93399ab7ec",
+    "vulnerable_version": "6.10.1"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "smtp.gmail.com:127.0.0.1",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/runtime_case.json:/opt/vulveil/case.json:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/run_extension_case.py:/opt/vulveil/run_extension_case.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/runtime:/opt/gt/runtime:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/profile.json:/opt/gt/rq1_host_profile.json:ro",
+        "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+        "python3",
+        "/opt/vulveil/run_extension_case.py",
+        "--spec",
+        "/opt/vulveil/case.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "smtp.gmail.com:127.0.0.1",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/runtime_case.json:/opt/vulveil/case.json:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/run_extension_case.py:/opt/vulveil/run_extension_case.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/runtime:/opt/gt/runtime:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/profile.json:/opt/gt/rq1_host_profile.json:ro",
+        "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+        "python3",
+        "/opt/vulveil/run_extension_case.py",
+        "--spec",
+        "/opt/vulveil/case.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "aa8eb894b4608775d4a24681ebfd173505a4453630399a6f601f1eabca13f60b",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "03f55bddbee1de6581645a4dc6aecff6121cf07155be803cdeba9ad034c2de76"
+  },
+  "tool": {
+    "name": "send_email",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "body": "frozen body",
+        "subject": "frozen-notification-024",
+        "to": "\"quoted24\"@internal.domain"
+      },
+      "name": "send_email"
+    }
+  ]
+}

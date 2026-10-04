@@ -1,0 +1,42 @@
+{
+  "agent_task": "Call the frozen send_email Tool once and report only its returned result.",
+  "base_case": "GH-P10-028",
+  "boundary": {
+    "kind": "container-local-smtp",
+    "network": "none",
+    "recipient_policy": "accept"
+  },
+  "case_id": "RQ1X-021",
+  "identity": {
+    "advisory": "GHSA-mm7p-fcc7-pg87",
+    "component": "pkg:npm/nodemailer",
+    "repository": "https://github.com/amotivv/protonmail-mcp",
+    "repository_commit": "fdca87e7a0615c21a2b7a4b411e39c93399ab7ec"
+  },
+  "runtime": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+    "image_id": "sha256:ea6af266ebbd3f3ec2c315487d1e4350650260e04ab9cb87ab7180d85b6a0db8",
+    "network": "none",
+    "read_only_rootfs": true,
+    "security_opt": [
+      "no-new-privileges:true"
+    ]
+  },
+  "schema_version": "rq1-extension-label-free-case/v1",
+  "system_prompt": "You are a deterministic research host. Execute the frozen Tool call exactly once.",
+  "tool": {
+    "input": {
+      "body": "frozen body",
+      "subject": "frozen-notification-021",
+      "to": "\"quoted21\"@internal.domain"
+    },
+    "name": "send_email"
+  },
+  "versions": {
+    "fixed": "7.0.7",
+    "vulnerable": "6.10.1"
+  }
+}

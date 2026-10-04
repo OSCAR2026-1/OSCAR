@@ -1,0 +1,29 @@
+# Test File
+test_file.py
+
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+*.egg-info/
+
+# Dev readme files
+learning.md
+# Eval harness: raw downloads stay local; result JSONs are committed as the
+# public evidence behind README claims. Logs are console noise, and private/
+# holds unstripped originals (see evals/results/README.md).
+evals/datasets/raw/
+evals/results/*.log
+evals/results/private/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# Internal project context (kept locally, not published)
+docs/context.md

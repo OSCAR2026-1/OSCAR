@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "oscar-agent-vulnerability"
+version = "0.1.0"
+description = "Cross-layer runtime effect analysis for known OSS vulnerabilities in agent systems"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {file = "LICENSE"}
+authors = [{name = "OSCAR Authors"}]
+dependencies = [
+  "jsonschema>=4.18",
+  "PyYAML>=6.0",
+]
+
+[project.scripts]
+oscar = "oscar.cli:main"
+oscar-evaluate = "oscar.evaluation.evaluate:main"
+
+[tool.setuptools.packages.find]
+include = ["oscar*"]
+
+[tool.setuptools.package-data]
+oscar = ["schemas/*.json"]

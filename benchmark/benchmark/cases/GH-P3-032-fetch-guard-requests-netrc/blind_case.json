@@ -1,0 +1,247 @@
+{
+  "agent_task": {
+    "text": "Call the frozen fetch Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "0582fe044c0c59c88e6f7db48aad3d70da9c365d27f66460adb427f97f8ec5d2"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "2d3913c1c26913d255130daf69912ba5eac8895446236ea20ef6ed52eb797f54"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "426d23a32233089a876f3f4ee8d06727a436c756b29e4565e768479bf0f3fbf5"
+    }
+  },
+  "case_id": "GH-P3-032-fetch-guard-requests-netrc",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:41a5246af35aeb67b7f61a2fd2a45fd15f16060c34f20a947147e9927bba3efa",
+    "image_id": "sha256:41a5246af35aeb67b7f61a2fd2a45fd15f16060c34f20a947147e9927bba3efa",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "efd02fe9a8c13952386949753bf71d2619c86361e233934f1873c4e3ff1254a7",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {
+      "js": false,
+      "links": "domains",
+      "max_words": 200,
+      "strict": false,
+      "timeout": 5,
+      "url": "http://trusted.internal:80@127.0.0.1:18080/agent-readback"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+    "advisory_semantics": {
+      "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+      "claims": [
+        {
+          "claim_id": "netrc-credential-third-party-transmission",
+          "effect_kind": "RESOURCE_EFFECT",
+          "effect_role": "TERMINAL",
+          "exact_quote": "leak .netrc credentials to third parties",
+          "object_kind": "http-credential-transmission",
+          "operation": "send",
+          "runtime_oracle": {
+            "effect_event_operation": "send",
+            "kind": "http-credential-provenance/v1"
+          }
+        }
+      ],
+      "review_method": "human-reviewed-public-advisory/v1",
+      "schema_version": "public-advisory-effect-semantics/v1",
+      "source_excerpt": "Requests vulnerable to .netrc credentials leak via malicious URLs\nDue to a URL parsing issue, Requests releases prior to 2.32.4 may leak .netrc credentials to third parties for specific maliciously-crafted URLs.",
+      "source_excerpt_sha256": "07872f4ddbe2d232c47ca3204be9cc177efa6e7d70f8c3656da18f3ef516fbee",
+      "source_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7"
+    },
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7",
+    "component_name": "requests",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:pypi/requests",
+    "fixed_version": "2.32.4",
+    "patch_url": "https://github.com/requests/requests/compare/v2.32.3...v2.32.4",
+    "repository_url": "https://github.com/Erodenn/fetch-guard",
+    "source_commit": "9431b2c8562a4736e8251010639b441c863e2b6c",
+    "vulnerable_version": "2.32.3"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P3-032-fetch-guard-requests-netrc.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P3-032-fetch-guard-requests-netrc/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p3_032.py:/opt/gt/run_gh_p3_032.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/source_fixed:/workspace/source:ro",
+        "sha256:41a5246af35aeb67b7f61a2fd2a45fd15f16060c34f20a947147e9927bba3efa",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p3_032.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P3-032-fetch-guard-requests-netrc.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P3-032-fetch-guard-requests-netrc/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p3_032.py:/opt/gt/run_gh_p3_032.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/source_vulnerable:/workspace/source:ro",
+        "sha256:41a5246af35aeb67b7f61a2fd2a45fd15f16060c34f20a947147e9927bba3efa",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p3_032.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "274f7b1282da10bd7f92c033c68dbca67f3a9f250570250fa10ec72a5fd8e85b",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "274f7b1282da10bd7f92c033c68dbca67f3a9f250570250fa10ec72a5fd8e85b"
+  },
+  "tool": {
+    "name": "fetch",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "js": false,
+        "links": "domains",
+        "max_words": 200,
+        "strict": false,
+        "timeout": 5,
+        "url": "http://trusted.internal:80@127.0.0.1:18080/agent-readback"
+      },
+      "name": "fetch"
+    }
+  ]
+}

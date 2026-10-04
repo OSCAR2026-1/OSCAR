@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vulveil-cross-layer-graph-view/v1",
+  "type": "object",
+  "required": [
+    "schema_version", "view", "source_graph_id", "effect_ids", "nodes", "edges",
+    "collapsed_nodes", "collapsed_edges", "effect_path_status", "graph_validation",
+    "projection_validation", "status"
+  ],
+  "properties": {
+    "schema_version": {"const": "vulveil-cross-layer-graph-view/v1"},
+    "view": {"const": "effect-centered"},
+    "source_graph_id": {"type": ["string", "null"]},
+    "source_graph_digest": {"type": ["string", "null"]},
+    "effect_ids": {"type": "array", "items": {"type": "string"}},
+    "component_origin": {"type": ["string", "null"]},
+    "vulnerability_component": {"type": "object"},
+    "status": {"enum": ["COMPLETE", "PARTIAL", "UNASSESSED", "INVALID"]},
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["node_id", "kind", "layer", "side", "identity", "effect_ids"],
+        "properties": {
+          "node_id": {"type": "string"},
+          "source_node_id": {"type": "string"},
+          "layer": {"type": "string"},
+          "kind": {"enum": [
+            "vulnerability_anchor", "effect_instance", "program_value", "control_state",
+            "resource_event", "resource_state", "readback_value", "tool_result_field",
+            "json_rpc_field", "host_normalized_field", "session_event",
+            "exact_l4_content_block", "tool_call", "tool_handler", "agent_task"
+          ]},
+          "side": {"enum": ["vulnerable", "fixed", "both", null]},
+          "effect_ids": {"type": "array", "items": {"type": "string"}},
+          "source_effect_ids": {"type": "array", "items": {"type": "string"}},
+          "projection_effect_id": {"type": "string"}
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "edge_id", "source", "target", "kind", "side", "field_mapping", "effect_ids",
+          "carrier_effect_ids", "plane", "status", "effect_value_linked",
+          "transport_observed", "effect_carrier_observed", "exact_l4_observed", "evidence_refs",
+          "repetition", "tool_call_id", "invocation_id", "session_id", "trace_id", "span_id", "boundary"
+        ],
+        "properties": {
+          "edge_id": {"type": "string"},
+          "source": {"type": "string"},
+          "target": {"type": "string"},
+          "kind": {"enum": [
+            "PRODUCES", "CARRIED_BY", "DERIVES_VALUE", "RETURNS", "SERIALIZE", "SERIALIZES",
+            "PRESERVES", "TRANSFORMS", "FILTERS", "OBSERVE", "OBSERVES", "PROJECTS_TO_SESSION",
+            "WRITES_RESOURCE", "READS_RESOURCE", "STATE_WRITE", "STATE_READ", "ALIGNS_WITH",
+            "CALLS", "TASK_INVOKES"
+          ]},
+          "side": {"enum": ["vulnerable", "fixed", "both", null]},
+          "field_mapping": {"type": "object"},
+          "effect_ids": {"type": "array", "items": {"type": "string"}},
+          "carrier_effect_ids": {"type": "array", "items": {"type": "string"}},
+          "source_effect_ids": {"type": "array", "items": {"type": "string"}},
+          "source_carrier_effect_ids": {"type": "array", "items": {"type": "string"}},
+          "projection_effect_id": {"type": ["string", "null"]},
+          "plane": {"enum": ["EXECUTION", "EFFECT", "ALIGNMENT"]},
+          "status": {"enum": ["PRESERVED", "TRANSFORMED", "DROPPED", "UNASSESSED"]},
+          "effect_value_linked": {"type": "boolean"},
+          "transport_observed": {"type": "boolean"},
+          "effect_carrier_observed": {"type": "boolean"},
+          "exact_l4_observed": {"type": "boolean"},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "repetition": {"type": ["integer", "null"]},
+          "tool_call_id": {"type": ["string", "null"]},
+          "invocation_id": {"type": ["string", "null"]},
+          "session_id": {"type": ["string", "null"]},
+          "trace_id": {"type": ["string", "null"]},
+          "span_id": {"type": ["string", "null"]},
+          "boundary": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "collapsed_nodes": {"type": "array", "items": {"type": "object"}},
+    "collapsed_edges": {"type": "array", "items": {"type": "object"}},
+    "effect_relations": {"type": "array", "items": {"type": "object"}},
+    "effect_observation": {"type": "object"},
+    "stage4_effect_observation": {"type": "object"},
+    "effect_path_status": {"type": "object"},
+    "unresolved_boundaries": {"type": "array", "items": {"type": "string"}},
+    "graph_validation": {"type": "object", "required": ["status", "errors"]},
+    "projection_validation": {"type": "object", "required": ["status", "errors"]},
+    "projection_metadata": {"type": "object"}
+  }
+}

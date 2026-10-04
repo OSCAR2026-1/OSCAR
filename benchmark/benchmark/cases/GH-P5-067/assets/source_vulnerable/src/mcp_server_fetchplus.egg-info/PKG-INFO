@@ -1,0 +1,43 @@
+Metadata-Version: 2.4
+Name: mcp-server-fetchplus
+Version: 0.1.0
+Summary: MCP server for fetching web content and converting to markdown
+License: MIT
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+Requires-Dist: mcp
+Requires-Dist: requests
+Requires-Dist: beautifulsoup4
+Requires-Dist: html2markdown
+Requires-Dist: python-dotenv
+Requires-Dist: pydantic-settings
+Provides-Extra: dev
+Requires-Dist: pytest; extra == "dev"
+Requires-Dist: black; extra == "dev"
+Requires-Dist: isort; extra == "dev"
+
+# MCP-Server-FetchPlus
+
+一个符合 MCP（Model Context Protocol）标准的服务器，用于获取网页内容并转换为 Markdown 格式。
+
+## 功能
+
+- 根据用户输入的 URL 获取网页内容
+- 将网页内容转换为 Markdown 格式
+- 保留图片
+- 自动拆分过长的文档以适应大语言模型的上下文长度限制
+
+## 安装
+
+```bash
+pip install mcp-server-fetchplus
+```
+
+## 使用示例
+
+### 调用`fetch`工具获取首块内容
+```bash
+curl -X POST "http://localhost:8000/mcp/tool/fetch" \
+  -H "Content-Type: application/json" \
+  -d '{"url": "https://example.com"}'
+```

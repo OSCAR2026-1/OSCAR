@@ -1,0 +1,36 @@
+--- a/lib/docx/files.js
++++ b/lib/docx/files.js
+@@ -12,7 +12,18 @@
+ exports.uriToPath = uriToPath;
+ 
+ 
+-function Files(base) {
++function Files(options) {
++    options = options || {};
++    if (!options.externalFileAccess) {
++        return {
++            read: function(uri) {
++                return promises.reject(new Error("could not read external image '" + uri + "', external file access is disabled"));
++            }
++        };
++    }
++
++    var base = options.relativeToFile ? dirname(options.relativeToFile) : null;
++
+     function read(uri, encoding) {
+         return resolveUri(uri).then(function(path) {
+             return readFile(path, encoding).caught(function(error) {
+@@ -37,13 +48,6 @@
+         read: read
+     };
+ }
+-
+-
+-function relativeToFile(filePath) {
+-    return new Files(dirname(filePath));
+-}
+-
+-Files.relativeToFile = relativeToFile;
+ 
+ 
+ var readFile = promises.promisify(fs.readFile.bind(fs));

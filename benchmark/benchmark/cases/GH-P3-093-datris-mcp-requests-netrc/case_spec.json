@@ -1,0 +1,77 @@
+{
+  "case_id": "GH-P3-093-datris-mcp-requests-netrc",
+  "direct_runtime_dependency": {
+    "dependency_depth": 1,
+    "dependency_ecosystem": "pypi",
+    "dependency_name": "requests",
+    "dependency_purl": "pkg:pypi/requests",
+    "dependency_scope": "runtime",
+    "fixed_version": "2.32.4",
+    "lockfile": null,
+    "manifest": "mcp-server/pyproject.toml:24-33; requests is declared in project.dependencies",
+    "mcp_server_own_source_or_package_vulnerability": false,
+    "pair_resolution": "Unchanged Datris MCP source and shared runtime; only side-specific requests package root changes from 2.32.3 to 2.32.4.",
+    "relation_status": "affected_exact_direct_runtime",
+    "requirements_manifest": "mcp-server/requirements.txt:5; requests is a production install requirement",
+    "vulnerable_version": "2.32.3"
+  },
+  "discovery": {
+    "discovered_on": "2026-09-25",
+    "discovery_url": "https://mcp.so/servers/datris-platform-oss",
+    "repository_commit": "13d774d1018e1c602123722ccb9a57538d5d684c",
+    "repository_url": "https://github.com/datris/datris-platform-oss",
+    "source": "MCPZoo",
+    "source_archive_sha256": "81c3958337120edaf791dd4b7db783316a708e25c2764141d8dc9ad26cfc9ed5"
+  },
+  "environment": {
+    "base_image": "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+    "cap_drop": [
+      "ALL"
+    ],
+    "mounts": [
+      "run output:rw:/workspace/output"
+    ],
+    "network": "none",
+    "only_side_difference": "requests==2.32.3 versus requests==2.32.4",
+    "read_only_root": true,
+    "runtime_user": "1010:1010",
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "tmpfs": [
+      "/tmp:rw,nosuid,nodev"
+    ]
+  },
+  "experiment": {
+    "agent_task": "Call the frozen get_version Tool and report only its returned result.",
+    "external_boundary": "Container-local HTTP API readback at 127.0.0.1:18093 with Docker network none; it returns the received Authorization header and a case-specific marker.",
+    "input_effect_signal_absent": true,
+    "required_repetitions": 3,
+    "same_agent_task": true,
+    "same_frozen_input": true,
+    "same_host_session_boundary": true
+  },
+  "mcp_path_review": {
+    "dependency_api": "_dispatch('get_version') -> _call('get', '/api/v1/version') -> requests.get",
+    "fixed_blocking": "Requests 2.32.4 no longer selects trusted.internal from .netrc for this parsed URL; the same boundary is reached with the URL userinfo credential trusted.internal:80 and the secret is absent from Tool result and L4.",
+    "frozen_server_configuration": "DATRIS_API_URL=http://trusted.internal:80@127.0.0.1:18093",
+    "handler_path": "mcp-server/server.py:3136-3158 call_tool -> 3191+ _dispatch",
+    "mechanism_provenance_confirmed": true,
+    "sink_readback": "get_version normalized Tool result content and the same reflected credential in the role=tool content of model.next_request",
+    "tool": "get_version",
+    "tool_arguments": {},
+    "vulnerability_derived_state": "The case-specific .netrc password is introduced as an Authorization header by Requests 2.32.3, reflected by the controlled API boundary, and is absent from the frozen Tool arguments and server source.",
+    "vulnerability_path": "MCP get_version -> _dispatch -> _call -> requests.get -> vulnerable Requests selects trusted.internal .netrc credential while connecting to 127.0.0.1 -> boundary reflects Authorization in the HTTP response -> _call returns resp.text -> MCP Tool result"
+  },
+  "schema_version": "github-direct-case-spec/v1",
+  "vulnerability": {
+    "advisory_url": "https://github.com/psf/requests/security/advisories/GHSA-9hjg-9r4m-mvj7",
+    "aliases": [
+      "CVE-2024-47081",
+      "PYSEC-2026-1872"
+    ],
+    "effect_type": "SENSITIVE_INFORMATION_DISCLOSURE",
+    "id": "GHSA-9hjg-9r4m-mvj7",
+    "summary": "Requests releases before 2.32.4 can leak .netrc credentials for maliciously crafted URLs"
+  }
+}

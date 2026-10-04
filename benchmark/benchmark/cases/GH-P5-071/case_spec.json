@@ -1,0 +1,88 @@
+{
+  "case_id": "GH-P5-071",
+  "deduplication": {
+    "checked_active_gt": true,
+    "checked_candidate_pool": true,
+    "checked_exclusion_audit": true,
+    "checked_historical_gt": true,
+    "checked_parallel2": true,
+    "checked_parallel3": true,
+    "checked_parallel4": true,
+    "checked_parallel5": true,
+    "checked_parallel6": true,
+    "checked_parallel7": true,
+    "checked_parallel8": true,
+    "checked_parallel9": true,
+    "duplicate_repository": false,
+    "duplicate_vulnerability_tool_unit": false,
+    "server_inclusion_count_after": 1,
+    "server_inclusion_count_before": 0
+  },
+  "direct_runtime_dependency": {
+    "declared_constraint": "1.11.0",
+    "dependency_depth": 1,
+    "dependency_ecosystem": "npm",
+    "dependency_name": "mammoth",
+    "dependency_purl": "pkg:npm/mammoth",
+    "dependency_scope": "runtime",
+    "fixed_version": "1.11.0",
+    "lockfile": "source/pnpm-lock.yaml:3351 and 8510 resolve mammoth@1.11.0",
+    "manifest": "source/package.json:61 declares mammoth 1.11.0 under dependencies",
+    "manifest_proof": "The package is declared directly in production dependencies and the paired image replaces only node_modules/mammoth after the frozen source is built.",
+    "pair_only_changes_dependency": true,
+    "relation_status": "affected_exact_direct_runtime",
+    "vulnerable_version": "1.10.0"
+  },
+  "discovery": {
+    "default_branch": "main",
+    "discovered_on": "2026-09-26",
+    "discovery_url": "https://api.github.com/search/repositories?q=mcp+mammoth&per_page=50&sort=updated",
+    "repository_commit": "db42361d825d3a68664fbf61b6356d46e49bd06e",
+    "repository_url": "https://github.com/Orchardxyz/mammoth-mcp",
+    "source": "GitHub"
+  },
+  "experiment": {
+    "agent_task": "Call the frozen convert_docx_to_markdown Tool and report only its returned result.",
+    "effect_extraction_rule": "Inspect only normalized Tool result content and the exact role=tool L4 content; require the base64 of the runtime secret. Do not search arguments, schema, prompt, ordinary text, logs or path names.",
+    "external_boundary": "The container creates /tmp/GH_P5_071_SECRET.txt at runtime and reads a frozen DOCX whose external image relationship targets that path. No host secret, network, or external service is used; the secret value is absent from the fixture and frozen input.",
+    "frozen_input": {
+      "filePath": "/opt/fixture/GH-P5-071-controlled.docx",
+      "includeDefaultStyleMap": true,
+      "includeEmbeddedStyleMap": true
+    },
+    "required_repetitions": 3,
+    "system_prompt": "You are a deterministic research host. Use the frozen tool call and report only its returned Tool result.",
+    "transport": "stdio"
+  },
+  "mcp_path_review": {
+    "dependency_api": "source/src/index.ts:301 invokes the direct mammoth conversion API",
+    "fixed_behavior": "Mammoth 1.11.0 blocks the external file relationship for the same DOCX and returns only ordinary document text and a warning, without the secret-derived data URI.",
+    "handler_path": "source/src/index.ts:278-308 registers the MCP Tool and calls mammoth.convertToMarkdown({ path: absolutePath }, options)",
+    "ordinary_result_excluded": "Orchard controlled document text, absolute file path and fixed warning are not effect signals.",
+    "sink_readback": "The formatted conversion text in the final convert_docx_to_markdown Tool result and the exact role=tool content of the next model request.",
+    "tool": "convert_docx_to_markdown",
+    "vulnerability_derived_state": "The base64 bytes of a runtime-only private file are inserted into the Markdown image data URI; the private bytes are absent from the DOCX fixture, Tool input and AgentTask.",
+    "vulnerability_path": "convert_docx_to_markdown -> path.resolve/file access -> mammoth.convertToMarkdown({path}) -> Mammoth 1.10.0 resolves the DOCX external image r:link to /tmp/GH_P5_071_SECRET.txt -> secret bytes become a Markdown image data URI -> formatted Tool result"
+  },
+  "runner": {
+    "startup": "python3 /opt/gt/run_gh_p5_071.py --spec /opt/gt/case_spec.json --output /opt/output --side vulnerable|fixed --repetition 1..3",
+    "timeout_seconds": 60
+  },
+  "schema_version": "github-direct-case-spec/v1",
+  "versions": {
+    "fixed": "1.11.0",
+    "vulnerable": "1.10.0"
+  },
+  "vulnerability": {
+    "advisory_url": "https://github.com/advisories/GHSA-rmjr-87wv-gf87",
+    "affected_range": ">=0.3.25 <1.11.0",
+    "aliases": [
+      "CVE-2025-11849"
+    ],
+    "effect_type": "PATH_TRAVERSAL_OR_ARBITRARY_FILE_IO",
+    "fixed_version": "1.11.0",
+    "id": "GHSA-rmjr-87wv-gf87",
+    "summary": "Mammoth DOCX external image relationships can read arbitrary local files and encode bytes as data URIs",
+    "vulnerable_version": "1.10.0"
+  }
+}

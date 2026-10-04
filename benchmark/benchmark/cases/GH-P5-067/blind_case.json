@@ -1,0 +1,241 @@
+{
+  "agent_task": {
+    "text": "Call the frozen fetch_url Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "927c55ec2b8959b8e893bc278169bca3d91af2e47b45f97235c6a82e05979216"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "78dbb54b1828307f2587adae3e79f056ffbdecf37ebda460ebcab43f5fae0cf7"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "4678ab9d3ebc9c5908d2a60ddc3cc2254932e5829c9e0d1655b260449c02d8af"
+    }
+  },
+  "case_id": "GH-P5-067",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:e5fe753bc3640274bcb5544b52e181738cbc7ad1ce42e100b0ffab5356b6de51",
+    "image_id": "sha256:e5fe753bc3640274bcb5544b52e181738cbc7ad1ce42e100b0ffab5356b6de51",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "83116302e7f22f76d8694af48df676780e91f3584a3b563b980feff75e96f705",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {
+      "url": "http://start.example/start"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-fe0ded29596df27c",
+    "profile_sha256": "fe0ded29596df27cc283306960086e3d319fda84e1f49d9890e39618f6ba0687"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-j8r2-6x86-q33q",
+    "advisory_semantics": {
+      "advisory_id": "GHSA-j8r2-6x86-q33q",
+      "claims": [
+        {
+          "claim_id": "proxy-authorization-destination-transmission",
+          "effect_kind": "RESOURCE_EFFECT",
+          "effect_role": "TERMINAL",
+          "exact_quote": "leak Proxy-Authorization headers to destination servers",
+          "object_kind": "http-credential-transmission",
+          "operation": "send",
+          "runtime_oracle": {
+            "effect_event_operation": "send",
+            "kind": "http-proxy-credential-provenance/v1"
+          }
+        }
+      ],
+      "review_method": "human-reviewed-public-advisory/v1",
+      "schema_version": "public-advisory-effect-semantics/v1",
+      "source_excerpt": "Requests can leak Proxy-Authorization headers to destination servers during redirects to HTTPS\nWhen a proxied request follows an HTTP to HTTPS redirect, Requests may reattach the Proxy-Authorization header to the HTTPS destination request.",
+      "source_excerpt_sha256": "72eef289afeb6e4652169cebcba641f7814baccd84a7670fd3ab7cba8e8bc71a",
+      "source_url": "https://osv.dev/vulnerability/GHSA-j8r2-6x86-q33q"
+    },
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-j8r2-6x86-q33q",
+    "component_name": "requests",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:pypi/requests",
+    "fixed_version": "2.31.0",
+    "patch_url": "https://github.com/requests/requests/compare/v2.30.0...v2.31.0",
+    "repository_url": "https://github.com/unclevicky/mcp-server-fetchplus",
+    "source_commit": "7affe5a27de9f320d39d37446e006e70e31f6894",
+    "vulnerable_version": "2.30.0"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "marker.example:127.0.0.1",
+        "--add-host",
+        "attacker.example:127.0.0.1",
+        "--add-host",
+        "start.example:127.0.0.1",
+        "--add-host",
+        "destination.example:127.0.0.1",
+        "--add-host",
+        "proxy.example:127.0.0.1",
+        "--add-host",
+        "www.muckrock.com:127.0.0.1",
+        "--add-host",
+        "accounts.muckrock.com:127.0.0.1",
+        "--add-host",
+        "example.com:127.0.0.1",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "RQ1_HOST_PROFILE_SOURCE_SHA256=ea03299160fde39fd2fd20ae9abd5e9897898e9fc994e62447aa867a8f11661f",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P5-067.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p5_067.py:/opt/gt/run_gh_p5_067.py:ro",
+        "sha256:e5fe753bc3640274bcb5544b52e181738cbc7ad1ce42e100b0ffab5356b6de51",
+        "python3",
+        "/opt/gt/run_gh_p5_067.py",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "marker.example:127.0.0.1",
+        "--add-host",
+        "attacker.example:127.0.0.1",
+        "--add-host",
+        "start.example:127.0.0.1",
+        "--add-host",
+        "destination.example:127.0.0.1",
+        "--add-host",
+        "proxy.example:127.0.0.1",
+        "--add-host",
+        "www.muckrock.com:127.0.0.1",
+        "--add-host",
+        "accounts.muckrock.com:127.0.0.1",
+        "--add-host",
+        "example.com:127.0.0.1",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "RQ1_HOST_PROFILE_SOURCE_SHA256=ea03299160fde39fd2fd20ae9abd5e9897898e9fc994e62447aa867a8f11661f",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P5-067.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p5_067.py:/opt/gt/run_gh_p5_067.py:ro",
+        "sha256:e5fe753bc3640274bcb5544b52e181738cbc7ad1ce42e100b0ffab5356b6de51",
+        "python3",
+        "/opt/gt/run_gh_p5_067.py",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "1702f8d3f472e84f8b20fd571cc7665909efaf4c2f9d70bbbb9a16be19f3f181",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "1702f8d3f472e84f8b20fd571cc7665909efaf4c2f9d70bbbb9a16be19f3f181"
+  },
+  "tool": {
+    "name": "fetch_url",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "url": "http://start.example/start"
+      },
+      "name": "fetch_url"
+    }
+  ]
+}

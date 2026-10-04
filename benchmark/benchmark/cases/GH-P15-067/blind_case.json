@@ -1,0 +1,207 @@
+{
+  "agent_task": {
+    "text": "Call the frozen iphone_interface_snapshot Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "645f12eac51ff87b42c8c0540bef2f43ca590b6a4bb6f5e1aebfcd242baeea9f"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "6a3b105f05379b7276d0f2c32f99a22919d621a396b6816cb5db72bf8839aa92"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "c644fd781a9cea864f69eecb609d1454206eb5946abbba79b874c09bf07df29f"
+    }
+  },
+  "case_id": "GH-P15-067",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:0743cec46450f7d544ccbf53f700b18bde0725b12f22fb51a95759586290c0da",
+    "image_id": "sha256:0743cec46450f7d544ccbf53f700b18bde0725b12f22fb51a95759586290c0da",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "546695e10a3eda447624bec6a1caee82ca082996dddd7a6db24d9a4913437411",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {}
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-9h52-p55h-vw2f",
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-9h52-p55h-vw2f",
+    "component_name": "mcp",
+    "component_origin": "MCP_FRAMEWORK",
+    "component_purl": "pkg:pypi/mcp",
+    "fixed_version": "1.23.0",
+    "patch_url": "https://github.com/mcp/mcp/compare/v1.22.0...v1.23.0",
+    "repository_url": "https://github.com/Lakr233/iphone-mcp",
+    "source_commit": "3508de0230eeca39e2b4f61fd316cbc7f021187c",
+    "vulnerable_version": "1.22.0"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P15-067.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P15-067/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p15_067.py:/opt/gt/run_case.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "sha256:0743cec46450f7d544ccbf53f700b18bde0725b12f22fb51a95759586290c0da",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_case.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P15-067.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P15-067/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p15_067.py:/opt/gt/run_case.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "sha256:0743cec46450f7d544ccbf53f700b18bde0725b12f22fb51a95759586290c0da",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_case.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "1a2e1270cc401cfe48ee02549a04d989344709cb6b3722f58c97b5d352393aeb",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "1a2e1270cc401cfe48ee02549a04d989344709cb6b3722f58c97b5d352393aeb"
+  },
+  "tool": {
+    "name": "iphone_interface_snapshot",
+    "transport": "streamable-http"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {},
+      "name": "iphone_interface_snapshot"
+    }
+  ]
+}

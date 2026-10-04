@@ -1,0 +1,11 @@
+{
+  "profile_id": "rq1-evaluation-sanitized-projection/v1",
+  "projection": {
+    "actual_name": "result",
+    "drop": "result",
+    "expected_name": "return_value",
+    "input": "structuredContent object",
+    "kind": "field_alias_drop"
+  },
+  "schema_version": "rq1-label-free-host-profile/v1"
+}

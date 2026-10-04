@@ -1,0 +1,1050 @@
+#!/usr/bin/env python3
+"""
+Datris CLI — Command-line interface for the Datris Data Platform via MCP.
+
+Usage:
+    pip install datris-mcp-server
+    datris pipelines
+    datris ingest data.csv --pipeline my_data --dest postgres
+    datris query "SELECT * FROM my_data LIMIT 10"
+    datris delete my_data
+
+Environment:
+    MCP_SERVER_URL   MCP SSE endpoint (default http://localhost:3000/sse).
+    DATRIS_API_KEY   API key sent as the x-api-key header on every MCP request;
+                     required when the platform has API keys turned on.
+"""
+
+import asyncio
+import base64
+import json
+import os
+import sys
+import time
+
+import click
+import httpx
+from httpx_sse import aconnect_sse
+
+MCP_URL = os.getenv("MCP_SERVER_URL", "http://localhost:3000/sse")
+CLI_VERSION = "1.38.0"
+
+# ── MCP Client (lightweight, sync-wrapped) ────────────────────────────
+
+_endpoint = None
+_post_client = None
+_sse_client = None
+_responses = None
+_reader_task = None
+_sse_cm = None
+_msg_id = 0
+
+
+def _next_id():
+    global _msg_id
+    _msg_id += 1
+    return _msg_id
+
+
+_REJECTED_KEY_MSG = "MCP server rejected DATRIS_API_KEY (Configuration → API-Keys → Issue new key)"
+
+
+def _auth_headers():
+    """x-api-key header from DATRIS_API_KEY, read at call time (not import)."""
+    key = os.getenv("DATRIS_API_KEY", "")
+    return {"x-api-key": key} if key else {}
+
+
+async def _close_clients():
+    for c in (_sse_client, _post_client):
+        if c:
+            try:
+                await c.aclose()
+            except Exception:
+                pass
+
+
+async def _connect():
+    global _endpoint, _post_client, _sse_client, _responses, _reader_task, _sse_cm
+
+    _sse_client = httpx.AsyncClient(timeout=httpx.Timeout(5, read=300))
+    _post_client = httpx.AsyncClient(timeout=30, limits=httpx.Limits(max_keepalive_connections=0))
+    _responses = asyncio.Queue()
+
+    headers = _auth_headers()
+    # copy: aconnect_sse mutates its headers dict (adds Accept/Cache-Control)
+    _sse_cm = aconnect_sse(_sse_client, "GET", MCP_URL, headers=dict(headers))
+    sse = await _sse_cm.__aenter__()
+
+    # aconnect_sse does not raise on a non-200; without this check a 401 only
+    # surfaces as a generic "No endpoint" error after the wait below.
+    status = sse.response.status_code
+    if status != 200:
+        cm = _sse_cm
+        _sse_cm = None
+        try:
+            await cm.__aexit__(None, None, None)
+        except Exception:
+            pass
+        await _close_clients()
+        _sse_client = _post_client = None
+        if status == 401 and headers:
+            raise click.ClickException(_REJECTED_KEY_MSG)
+        if status == 401:
+            raise click.ClickException(
+                "MCP server requires an API key: export DATRIS_API_KEY=<key> "
+                "(Configuration → API-Keys → Issue new key)")
+        raise click.ClickException(f"MCP server returned HTTP {status} from {MCP_URL}")
+
+    async def _read():
+        global _endpoint
+        try:
+            async for event in sse.aiter_sse():
+                if event.event == "endpoint":
+                    base = MCP_URL.rsplit("/", 1)[0]
+                    _endpoint = base + event.data
+                elif event.event == "message":
+                    await _responses.put(json.loads(event.data))
+        except (asyncio.CancelledError, Exception):
+            pass
+
+    _reader_task = asyncio.create_task(_read())
+
+    for _ in range(50):
+        if _endpoint:
+            break
+        await asyncio.sleep(0.1)
+    if not _endpoint:
+        raise ConnectionError("No endpoint from MCP server")
+
+    # Initialize
+    init_id = _next_id()
+    await _post_client.post(_endpoint, headers=headers, json={
+        "jsonrpc": "2.0", "id": init_id,
+        "method": "initialize",
+        "params": {"protocolVersion": "2024-11-05", "capabilities": {}, "clientInfo": {"name": "datris-cli", "version": CLI_VERSION}},
+    })
+    await asyncio.wait_for(_responses.get(), 10)
+    await _post_client.post(_endpoint, headers=headers, json={"jsonrpc": "2.0", "method": "notifications/initialized"})
+
+
+async def _call_tool(name, arguments=None):
+    if not _endpoint:
+        await _connect()
+
+    call_id = _next_id()
+    await _post_client.post(_endpoint, headers=_auth_headers(), json={
+        "jsonrpc": "2.0", "id": call_id,
+        "method": "tools/call",
+        "params": {"name": name, "arguments": arguments or {}},
+    })
+
+    while True:
+        try:
+            resp = await asyncio.wait_for(_responses.get(), 120)
+        except asyncio.TimeoutError:
+            return {"error": f"Timeout: {name}"}
+        if resp.get("id") == call_id:
+            break
+
+    if "error" in resp:
+        message = resp["error"].get("message", str(resp["error"]))
+        if "Invalid x-api-key" in message:
+            raise click.ClickException(_REJECTED_KEY_MSG)
+        return {"error": message}
+
+    content = resp.get("result", {}).get("content", [])
+    text = "\n".join(b["text"] for b in content if b.get("type") == "text")
+    try:
+        parsed = json.loads(text)
+    except (json.JSONDecodeError, TypeError):
+        return {"text": text}
+    # The MCP server only checks that a key is present; the Datris API rejects
+    # a wrong one inside the tool call and server.py relays its error body as a
+    # top-level {"error": "Invalid x-api-key..."}. Match only that shape so
+    # tool data that merely contains the phrase is not misreported. Never echo
+    # the key back.
+    if isinstance(parsed, dict) and isinstance(parsed.get("error"), str) \
+            and parsed["error"].startswith("Invalid x-api-key"):
+        raise click.ClickException(_REJECTED_KEY_MSG)
+    return parsed
+
+
+async def _disconnect():
+    """Tear down the SSE session inside the loop that opened it: cancel and
+    await the reader first so aiter_sse() is no longer running when the
+    aconnect_sse context exits (otherwise contextlib raises "generator didn't
+    stop after athrow()" at loop shutdown), then close the clients and reset
+    the globals so the next call reconnects."""
+    global _endpoint, _post_client, _sse_client, _responses, _reader_task, _sse_cm
+    if _reader_task:
+        _reader_task.cancel()
+        try:
+            await _reader_task
+        except (asyncio.CancelledError, Exception):
+            pass
+    if _sse_cm:
+        try:
+            await _sse_cm.__aexit__(None, None, None)
+        except Exception:
+            pass
+    await _close_clients()
+    _endpoint = _post_client = _sse_client = _responses = _reader_task = _sse_cm = None
+
+
+async def _call_tool_once(name, arguments=None):
+    try:
+        return await _call_tool(name, arguments)
+    finally:
+        await _disconnect()
+
+
+def mcp(name, args=None):
+    """Synchronous wrapper for MCP tool calls.
+
+    asyncio.run creates a fresh loop per call; get_event_loop() raised
+    "There is no current event loop" on Python 3.14 for every command. The
+    SSE session is bound to that loop, so each call connects and disconnects
+    within it.
+    """
+    return asyncio.run(_call_tool_once(name, args))
+
+
+def b64_file(path):
+    with open(path, "rb") as f:
+        return base64.b64encode(f.read()).decode()
+
+
+# ── CLI Commands ──────────────────────────────────────────────────────
+
+@click.group()
+@click.version_option(version=CLI_VERSION)
+def cli():
+    """Datris CLI — The Data Control Plane for AI Agents
+
+    \b
+    Environment:
+      MCP_SERVER_URL  MCP SSE endpoint (default http://localhost:3000/sse)
+      DATRIS_API_KEY  API key, sent as x-api-key (needed when API keys are on)
+    """
+    pass
+
+
+@cli.command()
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def pipelines(json_output):
+    """List all registered pipelines."""
+    result = mcp("list_pipelines")
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, dict) and result.get("pipelines") == []:
+        click.echo("No pipelines registered.")
+        return
+    if isinstance(result, list):
+        for p in result:
+            name = p.get("name", "unknown")
+            dest = ""
+            d = p.get("destination", {})
+            if d.get("database", {}).get("usePostgres"): dest = "→ PostgreSQL"
+            elif d.get("database", {}).get("useMongoDB"): dest = "→ MongoDB"
+            elif d.get("database", {}).get("useSnowflake"): dest = "→ Snowflake"
+            elif d.get("database", {}).get("useDatabricks"): dest = "→ Databricks"
+            elif d.get("pgvector"): dest = "→ pgvector"
+            elif d.get("qdrant"): dest = "→ Qdrant"
+            elif d.get("weaviate"): dest = "→ Weaviate"
+            elif d.get("milvus"): dest = "→ Milvus"
+            elif d.get("chroma"): dest = "→ Chroma"
+            click.echo(f"  {name} {dest}")
+    else:
+        click.echo(json.dumps(result, indent=2)[:500])
+
+
+@cli.group("pipeline")
+def pipeline_group():
+    """Commands on a single pipeline run (e.g. read a Live Read pipeline's result)."""
+    pass
+
+
+def _explain_result_error(result):
+    """Translate a get_pipeline_result error into the two cases a human hits.
+
+    The MCP tool relays the server body verbatim, so there are three shapes:
+    the endpoint's own `{"error": "Only Live Read (scratch) pipelines have a
+    result; ..."}` / `{"error": "Live Read results expire after N hour(s); ...
+    run the pipeline again"}` (pre-rename servers say "Only scratch pipelines"
+    / "Scratch results expire"; both are matched), Spring's default `{"status": 404, "error": "Not Found", ...}`
+    from a server that predates the route, and a bare string.
+    """
+    status = result.get("status") if isinstance(result, dict) else None
+    err = result.get("error", result) if isinstance(result, dict) else result
+    text = str(err)
+    low = text.strip().lower()
+    if (status == 404 or low == "not found" or low.startswith("404")
+            or low.startswith("only live read") or low.startswith("only scratch pipelines")
+            or low.startswith("no pipeline run found")):
+        return "Error: only Live Read (scratch) pipelines have a result (or this server predates Live Read results)"
+    if status == 410 or low == "gone" or low.startswith("410") or ("expire" in low and "run the pipeline again" in low):
+        return "Error: the result expired — run the pipeline again"
+    return f"Error: {text[:200]}"
+
+
+def _is_result_error(result):
+    return not isinstance(result, dict) or "error" in result or "records" not in result
+
+
+@pipeline_group.command("result")
+@click.argument("token")
+@click.option("--offset", type=int, default=None, help="Row offset to start from (default 0)")
+@click.option("--limit", type=int, default=None, help="Rows per page (server default and cap apply)")
+@click.option("--out", type=click.Path(dir_okay=False), default=None, help="Write every row as one JSON object per line to this file, paging until the result is exhausted")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def pipeline_result(token, offset, limit, out, json_output):
+    """Read the rows a Live Read pipeline produced (TOKEN is the pipeline token)."""
+    def page(off, lim):
+        args = {"pipeline_token": token}
+        if off is not None:
+            args["offset"] = off
+        if lim is not None:
+            args["limit"] = lim
+        return mcp("get_pipeline_result", args)
+
+    if out:
+        written = 0
+        current = offset or 0
+        with open(out, "w") as f:
+            while True:
+                result = page(current, limit)
+                if _is_result_error(result):
+                    click.echo(_explain_result_error(result))
+                    sys.exit(1)
+                records = result.get("records") or []
+                for rec in records:
+                    f.write(json.dumps(rec) + "\n")
+                written += len(records)
+                if not result.get("truncated") or not records:
+                    break
+                # limit is clamped server-side: advance by what actually came back.
+                current += result.get("returnedCount", len(records))
+        click.echo(f"  \u2713 Wrote {written} row(s) to {out}")
+        return
+
+    result = page(offset, limit)
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        if _is_result_error(result):
+            sys.exit(1)
+        return
+    if _is_result_error(result):
+        click.echo(_explain_result_error(result))
+        sys.exit(1)
+    records = result.get("records") or []
+    returned = result.get("returnedCount", len(records))
+    total = result.get("rowCount", len(records))
+    expires = result.get("resultExpiresAt", "unknown")
+    click.echo(f"  showing {returned} of {total}, expires at {expires}")
+    if result.get("truncated"):
+        click.echo(f"  (truncated — use --offset {result.get('offset', 0) + returned} for the next page, or --out to fetch everything)")
+    for rec in records:
+        click.echo("  " + json.dumps(rec))
+
+
+@cli.command()
+@click.argument("file", type=click.Path(exists=True))
+@click.option("--pipeline", "-p", default=None, help="Pipeline name (default: derived from filename)")
+@click.option("--dest", "-d", default="postgres", type=click.Choice(["postgres", "mongodb", "snowflake", "databricks", "qdrant", "weaviate", "milvus", "chroma", "pgvector"]), help="Destination type")
+@click.option("--table", "-t", default=None, help="Table/collection name (default: pipeline name)")
+@click.option("--database", default="datris", help="Database name (for snowflake: the Snowflake database; for databricks: the Unity Catalog name — required for both)")
+@click.option("--schema", default=None, help="Destination schema (snowflake default: PUBLIC; databricks default: default)")
+@click.option("--warehouse", default=None, help="Snowflake warehouse name, or Databricks SQL warehouse ID (required for those destinations)")
+@click.option("--credentials-secret", default=None, help="Platform secret holding destination credentials (required for snowflake and databricks)")
+@click.option("--ai-validate", default=None, help="AI data quality rule (plain English, e.g. 'all prices must be positive')")
+@click.option("--ai-transform", default=None, help="AI transformation instruction (plain English, e.g. 'convert dates to YYYY/MM/DD')")
+@click.option("--ai-analyze", default=None, help="Ask a question about the data after ingestion (plain English)")
+@click.option("--catalog", default=None, help="Catalog label to group this pipeline with related pipelines (e.g. 'openclaw'). Only applied when creating a new pipeline.")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def ingest(file, pipeline, dest, table, database, schema, warehouse, credentials_secret, ai_validate, ai_transform, ai_analyze, catalog, json_output):
+    """Create a pipeline and ingest a data file."""
+    content = b64_file(file)
+    filename = os.path.basename(file)
+
+    # Auto-derive pipeline name from filename if not specified
+    if not pipeline:
+        pipeline = os.path.splitext(filename)[0].lower().replace("-", "_").replace(" ", "_")
+
+    # Skip create_pipeline if one already exists with this name. create_pipeline
+    # rebuilds the config from CLI flags only and POSTs it, which would clobber
+    # fields the user/agent set out-of-band (catalog, custom dataQuality, etc.).
+    # Re-ingest's intent is "load more data," not "reset the config." Delete the
+    # pipeline first if you want a fresh one.
+    existing = mcp("get_pipeline", {"pipeline": pipeline})
+    pipeline_exists = isinstance(existing, dict) and existing.get("name") == pipeline
+
+    if pipeline_exists:
+        click.echo(f"  Pipeline '{pipeline}' already exists — keeping existing config")
+        if ai_validate or ai_transform or catalog:
+            click.echo(f"  ⚠ --ai-validate / --ai-transform / --catalog ignored (delete the pipeline first to apply)")
+    else:
+        args = {
+            "content": content,
+            "filename": filename,
+            "pipeline": pipeline,
+            "destination": dest,
+        }
+        if table:
+            args["table"] = table
+        if database != "datris":
+            args["database"] = database
+        if schema:
+            args["schema"] = schema
+        if warehouse:
+            args["warehouse"] = warehouse
+        if credentials_secret:
+            args["credentialsSecret"] = credentials_secret
+        if ai_validate:
+            args["codegen_rule"] = ai_validate
+        if ai_transform:
+            args["codegen_transform"] = ai_transform
+        if catalog:
+            args["catalog"] = catalog
+
+        click.echo(f"  Creating pipeline '{pipeline}' → {dest}...")
+        result = mcp("create_pipeline", args)
+        if result.get("error"):
+            click.echo(f"  Error: {result['error'][:200]}")
+            sys.exit(1)
+        click.echo(f"  ✓ Pipeline created")
+
+        if ai_validate:
+            click.echo(f"  ✓ AI validation: {ai_validate}")
+        if ai_transform:
+            click.echo(f"  ✓ AI transformation: {ai_transform}")
+        if catalog:
+            click.echo(f"  ✓ Catalog: {catalog}")
+
+    # Upload data
+    click.echo(f"  Uploading {filename}...")
+    upload_result = mcp("upload_data", {"content": content, "filename": filename, "pipeline": pipeline})
+    if upload_result.get("error"):
+        click.echo(f"  Error: {upload_result['error'][:200]}")
+        sys.exit(1)
+    token = upload_result.get("pipelineToken", "")
+    click.echo(f"  ✓ Uploaded (token: {token[:36]})")
+
+    # Wait for completion — poll the rollup by pipelineToken so a single boolean
+    # tells us when the load is done.
+    click.echo(f"  Waiting...")
+    completed = False
+    for _ in range(30):
+        time.sleep(2)
+        status = mcp("get_job_status", {"pipeline_token": token})
+        rollup = status.get("rollup") if isinstance(status, dict) else None
+        if rollup and rollup.get("allDone"):
+            agg = rollup.get("status", "")
+            if agg in ("success", "warning"):
+                jobs = rollup.get("jobs") or []
+                elapsed = jobs[0].get("elapsed", "") if jobs else ""
+                click.echo(f"  ✓ Done ({elapsed})")
+                completed = True
+                break
+            else:
+                jobs = rollup.get("jobs") or []
+                err = (jobs[0].get("lastError") or {}) if jobs else {}
+                msg = err.get("description") or "unknown error"
+                where = err.get("processName")
+                prefix = f"{where}: " if where and not msg.startswith(where) else ""
+                click.echo(f"  ✗ Failed: {prefix}{msg[:200]}")
+                sys.exit(1)
+
+    if not completed:
+        click.echo(f"  ⚠ Timeout")
+        return
+
+    # Run AI analysis if requested
+    if ai_analyze:
+        table_name = table or pipeline
+        _run_analyze(ai_analyze, table_name, dest, json_output, pipeline=pipeline)
+
+
+def _run_analyze(question, table, dest, json_output, top_k=5, pipeline=None):
+    """Shared analyze logic for ingest --ai-analyze and datris analyze."""
+    click.echo(f"  Analyzing: {question}")
+
+    if dest == "postgres":
+        query_result = mcp("query_natural", {"question": question, "table": table})
+        if json_output:
+            click.echo(json.dumps(query_result, indent=2))
+            return
+        results = query_result.get("results", [])
+        sql = query_result.get("sql", "")
+        if sql:
+            click.echo(f"  SQL: {sql}")
+        if not results:
+            click.echo("  No results found.")
+            return
+        context = json.dumps(results, indent=2)
+        click.echo(f"  Generating AI answer...")
+        answer_result = mcp("ai_answer", {"query": question, "context": context})
+        answer = answer_result.get("answer", answer_result.get("text", str(answer_result)))
+        click.echo(f"\n  {answer}")
+
+    elif dest in ("snowflake", "databricks"):
+        # Pipeline-scoped query tools — the pipeline config carries the
+        # connection (credentials never leave the server).
+        if not pipeline:
+            click.echo(f"  Error: --pipeline is required to analyze a {dest} destination (the pipeline selects the connection)")
+            return
+        tool = "query_snowflake" if dest == "snowflake" else "query_databricks"
+        query_result = mcp(tool, {"pipeline": pipeline, "limit": 100})
+        if json_output:
+            click.echo(json.dumps(query_result, indent=2))
+            return
+        results = query_result.get("results", [])
+        if not results:
+            click.echo("  No results found.")
+            return
+        context = json.dumps(results, indent=2)
+        click.echo(f"  Generating AI answer...")
+        answer_result = mcp("ai_answer", {"query": question, "context": context})
+        answer = answer_result.get("answer", answer_result.get("text", str(answer_result)))
+        click.echo(f"\n  {answer}")
+
+    elif dest == "mongodb":
+        query_result = mcp("query_mongodb", {"collection": table, "limit": 100})
+        if json_output:
+            click.echo(json.dumps(query_result, indent=2))
+            return
+        results = query_result.get("results", [])
+        if not results:
+            click.echo("  No results found.")
+            return
+        context = json.dumps(results, indent=2)
+        click.echo(f"  Generating AI answer...")
+        answer_result = mcp("ai_answer", {"query": question, "context": context})
+        answer = answer_result.get("answer", answer_result.get("text", str(answer_result)))
+        click.echo(f"\n  {answer}")
+
+    else:
+        # Vector store — search → ai_answer
+        tool_map = {
+            "qdrant": ("search_qdrant", "collection"),
+            "weaviate": ("search_weaviate", "class_name"),
+            "milvus": ("search_milvus", "collection"),
+            "chroma": ("search_chroma", "collection"),
+            "pgvector": ("search_pgvector", "table"),
+        }
+        tool, key = tool_map[dest]
+        search_result = mcp(tool, {"query": question, key: table, "top_k": top_k})
+        if json_output:
+            click.echo(json.dumps(search_result, indent=2))
+            return
+        results = search_result.get("results", [])
+        if not results:
+            click.echo("  No results found.")
+            return
+        click.echo(f"  ✓ Found {len(results)} relevant chunk(s)")
+        context = "\n\n".join(r.get("text", str(r)) for r in results)
+        click.echo(f"  Generating AI answer...")
+        answer_result = mcp("ai_answer", {"query": question, "context": context})
+        answer = answer_result.get("answer", answer_result.get("text", str(answer_result)))
+        click.echo(f"\n  {answer}")
+
+
+@cli.command()
+@click.argument("question")
+@click.option("--table", "-t", required=True, help="Table/collection name")
+@click.option("--dest", "-d", default="postgres", type=click.Choice(["postgres", "mongodb", "snowflake", "databricks", "qdrant", "weaviate", "milvus", "chroma", "pgvector"]), help="Data source type")
+@click.option("--pipeline", "-p", default=None, help="Pipeline name (required for snowflake/databricks — the pipeline selects the connection)")
+@click.option("--top-k", "-k", default=5, help="Number of search results (vector stores only)")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON instead of AI narrative")
+def analyze(question, table, dest, pipeline, top_k, json_output):
+    """Ask a question about your data using AI."""
+    _run_analyze(question, table, dest, json_output, top_k, pipeline=pipeline)
+
+
+@cli.command()
+@click.argument("sql")
+@click.option("--limit", default=100, help="Max rows")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def query(sql, limit, json_output):
+    """Execute a read-only SQL query."""
+    result = mcp("query_postgres", {"sql": sql, "limit": limit})
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    results = result.get("results", [])
+    count = result.get("count", 0)
+    if not results:
+        click.echo("No results.")
+        return
+    cols = list(results[0].keys())
+    click.echo("  " + " | ".join(cols))
+    click.echo("  " + "-+-".join("-" * max(len(c), 10) for c in cols))
+    for row in results:
+        vals = [str(row.get(c, ""))[:30] for c in cols]
+        click.echo("  " + " | ".join(vals))
+    click.echo(f"\n  {count} row(s)")
+
+
+@cli.command()
+@click.argument("question")
+@click.option("--store", "-s", default="pgvector", type=click.Choice(["qdrant", "weaviate", "milvus", "chroma", "pgvector"]), help="Vector store to search")
+@click.option("--collection", "-c", required=True, help="Collection/table name")
+@click.option("--top-k", "-k", default=5, help="Number of results")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def search(question, store, collection, top_k, json_output):
+    """Semantic search across a vector database."""
+    tool_map = {
+        "qdrant": ("search_qdrant", "collection"),
+        "weaviate": ("search_weaviate", "class_name"),
+        "milvus": ("search_milvus", "collection"),
+        "chroma": ("search_chroma", "collection"),
+        "pgvector": ("search_pgvector", "table"),
+    }
+    tool, key = tool_map[store]
+    args = {"query": question, key: collection, "top_k": top_k}
+
+    click.echo(f"  Searching {store}/{collection}...")
+    result = mcp(tool, args)
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    results = result.get("results", [])
+    count = result.get("count", 0)
+
+    if not results:
+        click.echo("  No results found.")
+        return
+
+    for i, r in enumerate(results):
+        score = r.get("_score", "")
+        text = r.get("text", str(r))[:200]
+        score_str = f" (score: {score:.3f})" if isinstance(score, (int, float)) else ""
+        click.echo(f"\n  [{i+1}]{score_str}")
+        click.echo(f"  {text}")
+
+    click.echo(f"\n  {count} result(s)")
+
+
+@cli.command("query-mongo")
+@click.argument("collection")
+@click.option("--filter", "-f", "mongo_filter", default="{}", help="MongoDB filter JSON")
+@click.option("--projection", default=None, help="MongoDB projection JSON")
+@click.option("--limit", default=20, help="Max documents")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def query_mongo(collection, mongo_filter, projection, limit, json_output):
+    """Query a MongoDB collection."""
+    args = {"collection": collection, "limit": limit}
+    try:
+        args["filter"] = json.loads(mongo_filter)
+    except json.JSONDecodeError:
+        click.echo(f"  Error: Invalid filter JSON: {mongo_filter}")
+        sys.exit(1)
+    if projection:
+        try:
+            args["projection"] = json.loads(projection)
+        except json.JSONDecodeError:
+            click.echo(f"  Error: Invalid projection JSON: {projection}")
+            sys.exit(1)
+
+    result = mcp("query_mongodb", args)
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    results = result.get("results", [])
+    count = result.get("count", 0)
+
+    if not results:
+        click.echo("No results.")
+        return
+
+    for doc in results:
+        click.echo(f"  {json.dumps(doc, indent=2)[:300]}")
+    click.echo(f"\n  {count} document(s)")
+
+
+@cli.command()
+@click.argument("pipeline_name")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def status(pipeline_name, json_output):
+    """Get job status for a pipeline."""
+    result = mcp("get_job_status", {"pipeline_name": pipeline_name})
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, list):
+        for job in result[:5]:
+            s = job.get("status", "unknown")
+            t = job.get("totalTime", "")
+            p = job.get("pipeline", "")
+            icon = "✓" if s in ("success", "completed") else "✗" if s == "error" else "…"
+            click.echo(f"  {icon} {p} — {s} ({t})")
+    elif isinstance(result, dict) and "text" in result:
+        click.echo(result["text"][:500])
+
+
+@cli.command()
+@click.argument("pipeline_name")
+@click.option("--keep-data", is_flag=True, help="Keep destination data")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def delete(pipeline_name, keep_data, json_output):
+    """Delete a pipeline and its data."""
+    result = mcp("delete_pipeline", {"pipeline": pipeline_name})
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    click.echo(f"  ✓ Pipeline '{pipeline_name}' deleted" + (" (data kept)" if keep_data else ""))
+
+
+@cli.command()
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def health(json_output):
+    """Check backend service health."""
+    result = mcp("check_service_health")
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, dict):
+        for svc, info in result.items():
+            s = info.get("status", "unknown") if isinstance(info, dict) else info
+            icon = "✓" if s == "up" else "✗" if s == "down" else "○"
+            click.echo(f"  {icon} {svc}: {s}")
+
+
+@cli.command()
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def secrets(json_output):
+    """List all secrets (requires Datris REST API)."""
+    import requests
+    datris_url = os.getenv("DATRIS_URL", "http://localhost:8080")
+    try:
+        resp = requests.get(f"{datris_url}/api/v1/secrets", timeout=10)
+        data = resp.json()
+        if json_output:
+            click.echo(json.dumps(data, indent=2))
+            return
+        for name in data:
+            click.echo(f"  {name}")
+    except Exception as e:
+        click.echo(f"  Error: {e}")
+
+
+@cli.command()
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def taps(json_output):
+    """List all taps."""
+    result = mcp("list_taps")
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, list):
+        if not result:
+            click.echo("No taps created.")
+            return
+        for t in result:
+            name = t.get("name", "unknown")
+            pipeline = t.get("targetPipeline", "")
+            status = t.get("lastRunStatus", "never")
+            cron = t.get("cronExpression", "")
+            records = t.get("lastRunRecordCount", 0)
+            schedule = f" [{cron}]" if cron else ""
+            click.echo(f"  {name} → {pipeline}{schedule}  ({status}, {records} records)")
+    else:
+        click.echo(json.dumps(result, indent=2)[:500])
+
+
+@cli.group()
+def tap():
+    """Manage taps (create, show, run, test, update, logs, delete)."""
+    pass
+
+
+@tap.command("create")
+@click.argument("instruction", required=False, default=None)
+@click.option("--pipeline", "-p", default=None, help="Target pipeline name")
+@click.option("--name", "-n", default=None, help="Tap name (default: derived from pipeline or instruction)")
+@click.option("--script", "script_path", default=None, type=click.Path(exists=True), help="Path to a Python script file with a fetch() function")
+@click.option("--cron", default=None, help="CRON expression for scheduling (Quartz format)")
+@click.option("--secret", default=None, help="Vault secret name for credentials")
+@click.option("--type", "tap_type", type=click.Choice(["structured", "document"]), default="structured",
+              help="Tap type: 'structured' returns rows of records (default); 'document' returns file bytes for a vector-store pipeline")
+@click.option("--kind", type=click.Choice(["python", "http"]), default=None,
+              help="Tap implementation kind: 'python' (default) runs a script on the platform; 'http' calls a user-hosted endpoint speaking the tap HTTP contract")
+@click.option("--endpoint-url", default=None, help="For --kind http: absolute http(s) URL Datris POSTs the run context to on each run")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def tap_create(instruction, pipeline, name, script_path, cron, secret, tap_type, kind, endpoint_url, json_output):
+    """Create a tap from an instruction (AI generates script), script file, HTTP endpoint, or config only."""
+    # Derive tap name if not provided
+    if name:
+        tap_name = name
+    elif pipeline:
+        tap_name = f"{pipeline}-tap"
+    elif instruction:
+        tap_name = instruction.lower().replace(" ", "-")[:30].rstrip("-")
+    else:
+        click.echo("  Error: provide at least a --name, --pipeline, or instruction")
+        sys.exit(1)
+
+    args = {"name": tap_name, "tap_type": tap_type}
+
+    if kind == "http":
+        if script_path or instruction:
+            click.echo("  Error: --kind http taps have no platform-side script — drop the instruction/--script and pass --endpoint-url")
+            sys.exit(1)
+        if not endpoint_url:
+            click.echo("  Error: --endpoint-url is required with --kind http")
+            sys.exit(1)
+        args["kind"] = "http"
+        args["endpoint_url"] = endpoint_url
+        click.echo(f"  Creating HTTP tap '{tap_name}' → {endpoint_url}...")
+    elif endpoint_url:
+        click.echo("  Error: --endpoint-url requires --kind http")
+        sys.exit(1)
+    elif script_path:
+        with open(script_path, "r") as f:
+            args["script"] = f.read()
+        click.echo(f"  Storing script for tap '{tap_name}'...")
+    elif instruction:
+        args["instruction"] = instruction
+        click.echo(f"  Generating script for tap '{tap_name}'...")
+    else:
+        click.echo(f"  Creating tap config '{tap_name}' (no script)...")
+
+    if pipeline:
+        args["target_pipeline"] = pipeline
+    if cron:
+        args["cron_expression"] = cron
+    if secret:
+        args["secret_name"] = secret
+
+    result = mcp("create_tap", args)
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, dict) and result.get("error"):
+        click.echo(f"  Error: {result['error'][:200]}")
+        sys.exit(1)
+    click.echo(f"  ✓ Tap '{tap_name}' created")
+    if pipeline:
+        click.echo(f"    Pipeline: {pipeline}")
+    if cron:
+        click.echo(f"    Schedule: {cron}")
+
+
+@tap.command("run")
+@click.argument("name")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def tap_run(name, json_output):
+    """Run a tap manually."""
+    click.echo(f"  Running tap '{name}'...")
+    result = mcp("run_tap", {"name": name})
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, dict):
+        if result.get("error"):
+            click.echo(f"  Error: {result['error'][:200]}")
+            sys.exit(1)
+        status = result.get("status", "unknown")
+        records = result.get("recordCount", 0)
+        click.echo(f"  ✓ {status} — {records} records fetched")
+        if result.get("persisted") is True:
+            target = result.get("targetPipeline") or "pipeline"
+            pub = result.get("publisherToken")
+            click.echo(f"    → persisted to {target}")
+            if pub:
+                click.echo(f"    → watch: datris pipeline status --publisher {pub}")
+        elif result.get("persisted") is False:
+            reason = result.get("persistedReason", "unknown")
+            click.echo(f"    → not persisted ({reason})")
+    else:
+        click.echo(f"  {result}")
+
+
+@tap.command("delete")
+@click.argument("name")
+def tap_delete(name):
+    """Delete a tap."""
+    result = mcp("delete_tap", {"name": name})
+    if isinstance(result, dict) and result.get("error"):
+        click.echo(f"  Error: {result['error'][:200]}")
+        sys.exit(1)
+    click.echo(f"  ✓ Tap '{name}' deleted")
+
+
+@tap.command("show")
+@click.argument("name")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def tap_show(name, json_output):
+    """Show full details of a tap including its script."""
+    result = mcp("get_tap", {"name": name})
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, dict):
+        if result.get("error"):
+            click.echo(f"  Error: {result['error'][:200]}")
+            sys.exit(1)
+        click.echo(f"  Name:        {result.get('name')}")
+        click.echo(f"  Description: {result.get('description')}")
+        if (result.get("scriptKind") or "").lower() == "http":
+            click.echo(f"  Kind:        http")
+            click.echo(f"  Endpoint:    {result.get('endpointUrl')}")
+        click.echo(f"  Pipeline:    {result.get('targetPipeline')}")
+        click.echo(f"  Schedule:    {result.get('cronExpression', 'manual')}")
+        click.echo(f"  Enabled:     {result.get('enabled')}")
+        click.echo(f"  Secret:      {result.get('secretName', 'none')}")
+        click.echo(f"  Last run:    {result.get('lastRunStatus', 'never')} ({result.get('lastRunTime', '')})")
+        click.echo(f"  Last test:   {result.get('lastTestRunStatus', 'never')} ({result.get('lastTestRunTime', '')})")
+        script = result.get("script")
+        if script:
+            click.echo(f"\n  --- Script ---\n{script}")
+    else:
+        click.echo(f"  {result}")
+
+
+@tap.command("test")
+@click.argument("name")
+@click.option("--limit", type=int, default=20, show_default=True,
+              help="Max records to pull for the preview (0 = no cap, streams the whole source)")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def tap_test(name, limit, json_output):
+    """Test-run a tap without pushing to the pipeline (previews the first 20 records)."""
+    click.echo(f"  Testing tap '{name}'...")
+    result = mcp("test_tap", {"name": name, "limit": limit})
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, dict):
+        if result.get("error"):
+            click.echo(f"  ✗ Error: {result['error'][:200]}")
+            sys.exit(1)
+        status = result.get("status", "unknown")
+        records = result.get("recordCount", 0)
+        data_type = result.get("dataType", "")
+        click.echo(f"  ✓ {status} — {records} records (test preview) ({data_type})")
+    else:
+        click.echo(f"  {result}")
+
+
+@tap.command("logs")
+@click.argument("name")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def tap_logs(name, json_output):
+    """Show run history for a tap."""
+    result = mcp("get_tap_logs", {"name": name})
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, list):
+        if not result:
+            click.echo("  No run history.")
+            return
+        for entry in result:
+            status = entry.get("status", "unknown")
+            time = entry.get("runTime", "")
+            records = entry.get("recordCount", 0)
+            duration = entry.get("durationMs", 0)
+            mode = entry.get("mode") or ("run" if entry.get("pushToPipeline", True) else "test")
+            icon = "✓" if status == "success" else "✗"
+            mode_label = " (test)" if mode != "run" else ""
+            click.echo(f"  {icon} {time} — {status}{mode_label}, {records} records, {duration}ms")
+            if entry.get("error"):
+                click.echo(f"    Error: {entry['error'][:150]}")
+    else:
+        click.echo(f"  {result}")
+
+
+@tap.command("update")
+@click.argument("name")
+@click.option("--enabled/--disabled", default=None, help="Enable or disable the tap")
+@click.option("--cron", default=None, help="CRON expression for scheduling")
+@click.option("--pipeline", "-p", default=None, help="Target pipeline name")
+@click.option("--description", "-d", default=None, help="New description")
+@click.option("--endpoint-url", default=None, help="New endpoint URL (HTTP taps only)")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def tap_update(name, enabled, cron, pipeline, description, endpoint_url, json_output):
+    """Update a tap's configuration without regenerating the script."""
+    args = {"name": name}
+    if enabled is not None:
+        args["enabled"] = enabled
+    if cron is not None:
+        args["cron_expression"] = cron
+    if pipeline is not None:
+        args["target_pipeline"] = pipeline
+    if description is not None:
+        args["description"] = description
+    if endpoint_url is not None:
+        args["endpoint_url"] = endpoint_url
+
+    if len(args) == 1:
+        click.echo("  Nothing to update. Specify at least one option (--enabled/--disabled, --cron, --pipeline, --description, --endpoint-url).")
+        sys.exit(1)
+
+    result = mcp("update_tap", args)
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    if isinstance(result, dict):
+        if result.get("error"):
+            click.echo(f"  Error: {result['error'][:200]}")
+            sys.exit(1)
+        click.echo(f"  ✓ Tap '{name}' updated")
+    else:
+        click.echo(f"  {result}")
+
+
+@cli.command()
+@click.option("--pre-upgrade", is_flag=True, default=False,
+              help="Host checks only (plus the AI slot secrets via the vault container); safe to run with the server stopped. Prints the upgrade command on success.")
+@click.option("--probes", default="", help="Opt-in probe groups, comma-separated. `ai` sends a minimal request through each AI slot (spends a few tokens).")
+@click.option("--json", "json_output", is_flag=True, default=False, help="Print the merged report as JSON")
+@click.option("--compose-file", default=None, help="Compose file to inspect (default: docker-compose.yml in --project-dir)")
+@click.option("--project-dir", default=".", help="Directory holding docker-compose.yml and .env (default: current directory)")
+def doctor(pre_upgrade, probes, json_output, compose_file, project_dir):
+    """Operational self-check: server-side checks via the REST API plus host checks that need Docker.
+
+    Exit codes: 0 all ok, 1 any warning, 2 any error, 3 server unreachable (server checks skipped).
+    Unlike other commands this talks to the server directly (DATRIS_URL, DATRIS_API_KEY) — a dead
+    MCP server is itself a finding.
+    """
+    import doctor as doc
+    runner = doc.Runner(compose_file=compose_file, project_dir=os.path.abspath(project_dir))
+    datris_url = os.getenv("DATRIS_URL", "http://localhost:8080")
+    api_key = os.getenv("DATRIS_API_KEY", "")
+    server_report, version_info, server_error = None, None, None
+    if not pre_upgrade:
+        server_report, version_info, server_error = doc.fetch_server(datris_url, api_key, CLI_VERSION, probes=probes)
+    host = doc.run_host_checks(runner, MCP_URL, version_info=version_info, pre_upgrade=pre_upgrade)
+    report = doc.merge_report(server_report, host, CLI_VERSION, mode="pre-upgrade" if pre_upgrade else "full",
+                              server_error=server_error, datris_url=datris_url)
+    code = doc.exit_code(report, server_unreachable=(server_error is not None))
+    if json_output:
+        click.echo(json.dumps(report, indent=2))
+    else:
+        click.echo(doc.render_human(report))
+        if pre_upgrade and code in (0, 1):
+            click.echo("")
+            click.echo("  Ready to upgrade:")
+            click.echo("    docker compose pull && docker compose up -d --remove-orphans")
+    sys.exit(code)
+
+
+@cli.command()
+@click.option("--json", "json_output", is_flag=True, default=False, help="Return raw JSON")
+def version(json_output):
+    """Get server version."""
+    result = mcp("get_version")
+    if json_output:
+        click.echo(json.dumps(result, indent=2))
+        return
+    click.echo(f"  Server: {result.get('text', result) if isinstance(result, dict) else result}")
+    click.echo(f"  CLI: {CLI_VERSION}")
+
+
+def main():
+    cli()
+
+
+if __name__ == "__main__":
+    main()

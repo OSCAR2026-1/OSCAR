@@ -1,0 +1,88 @@
+{
+  "name": "mammoth-mcp",
+  "version": "1.1.1",
+  "packageManager": "pnpm@10.12.1",
+  "description": "MCP for mammoth - Convert DOCX files to HTML",
+  "type": "module",
+  "main": "dist/esm/index.js",
+  "types": "dist/esm/index.d.ts",
+  "bin": {
+    "mammoth-mcp": "dist/esm/index.js"
+  },
+  "scripts": {
+    "dev": "father dev",
+    "dev:inspector": "npm run dev & sleep 2 && npm run inspector",
+    "build": "father build && chmod +x dist/esm/index.js",
+    "build:deps": "father prebundle",
+    "prepublishOnly": "father doctor && npm run build",
+    "inspector": "lsof -ti:6275 | xargs kill -9 2>/dev/null || true && lsof -ti:6278 | xargs kill -9 2>/dev/null || true && chmod +x dist/esm/index.js && CLIENT_PORT=6275 SERVER_PORT=6278 mcp-inspector dist/esm/index.js",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json,md}\"",
+    "prepare": "husky",
+    "changeset": "changeset",
+    "changeset:add": "changeset add",
+    "version": "changeset version && git add . && git commit -m 'chore: version packages'",
+    "release": "pnpm run release:version && pnpm run release:tag",
+    "release:version": "pnpm changeset version && git add . && git commit -m 'chore: version packages' && git push origin main",
+    "release:tag": "git tag v$(node -p \"require('./package.json').version\") && git push origin v$(node -p \"require('./package.json').version\")"
+  },
+  "keywords": [
+    "mcp",
+    "mammoth",
+    "docx",
+    "html",
+    "converter",
+    "model-context-protocol"
+  ],
+  "authors": [
+    "Orchard <orchardyz@outlook.com>"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Orchardxyz/mammoth-mcp.git"
+  },
+  "homepage": "https://github.com/Orchardxyz/mammoth-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/Orchardxyz/mammoth-mcp/issues"
+  },
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.25.1",
+    "lodash-es": "^4.17.22",
+    "mammoth": "1.11.0",
+    "zod": "^4.3.2"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.1",
+    "@modelcontextprotocol/inspector": "^0.18.0",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "25.0.3",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "father": "^4.6.13",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.2",
+    "prettier": "^3.2.5"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{js,jsx,json,md}": [
+      "prettier --write"
+    ]
+  }
+}

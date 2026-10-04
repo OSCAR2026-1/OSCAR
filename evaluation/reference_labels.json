@@ -1,0 +1,257 @@
+{
+  "schema_version": "oscar-reference-labels/v1",
+  "case_count": 50,
+  "source_dataset_sha256": "01c7e7b719038e26d3d72517997b954ec967cb94d327a797faa768648f44895a",
+  "labels": [
+    {
+      "case_id": "CVE-2024-47081-zilliz",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P4-1101",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "CVE-2025-62718-sun-image",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P3-093-datris-mcp-requests-netrc",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P3-119-bitbucket-server-mcp-axios-no-proxy",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P3-063-rss-mcp-axios-no-proxy",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P2-002",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P4-054",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "CVE-2022-33987",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P3-032-fetch-guard-requests-netrc",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_AGENT"
+    },
+    {
+      "case_id": "GH-P3-009-rest-mcp-requests-netrc",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P5-045",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P15-067",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P5-071",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P4-002",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P5-067",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P4-111",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P5-046",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_TOOL"
+    },
+    {
+      "case_id": "GH-P10-025",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "CVE-2026-33989",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "GH-P10-028",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "CVE-2025-62718-markdown",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "RQ1X-006",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "RQ1X-007",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "RQ1X-008",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "RQ1X-017",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "RQ1X-018",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "RQ1X-019",
+      "impact_label": "IMPACT_YES",
+      "boundary_label": "B_ENV"
+    },
+    {
+      "case_id": "RQ1X-009",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-010",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-011",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-012",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-020",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-021",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-022",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-023",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-024",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-013",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-014",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-015",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-016",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-025",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-026",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-027",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "GH-P10-024",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-001",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-002",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-003",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-004",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    },
+    {
+      "case_id": "RQ1X-005",
+      "impact_label": "IMPACT_NO",
+      "boundary_label": null
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "built_case_count": 50,
+  "failures": [],
+  "hidden_input_access_count": 0,
+  "leakage_scan": "PASS",
+  "public_metadata_corrections": [
+    {
+      "case_id": "RQ1X-006",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-007",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-008",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-017",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-018",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-019",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-009",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-010",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-011",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-012",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-020",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-021",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-022",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-023",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-024",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-013",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-014",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-015",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-016",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-025",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-026",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    },
+    {
+      "case_id": "RQ1X-027",
+      "component": "nodemailer",
+      "versions": [
+        {
+          "declared": "7.0.5",
+          "observed": "6.10.1",
+          "side": "vulnerable"
+        }
+      ]
+    }
+  ],
+  "schema_version": "rq1-vulveil-public-readiness/v1",
+  "selected_case_count": 50,
+  "status": "READY"
+}

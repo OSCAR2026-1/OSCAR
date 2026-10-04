@@ -1,0 +1,1 @@
+{"schema_version":"vulveil-prediction/v1","case_identity":{"advisory":"CVE-CLI-FIXTURE-0001","package":"fixture-package","vulnerable_version":"1.0.0","fixed_version":"1.0.1"},"run_status":"UNASSESSED","invalid_reason":"cross_layer_graph_incomplete","predicted_reachability":null,"witnessed_level":null}

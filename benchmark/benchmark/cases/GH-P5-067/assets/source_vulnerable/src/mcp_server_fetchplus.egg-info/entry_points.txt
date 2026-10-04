@@ -1,0 +1,2 @@
+[console_scripts]
+mcp-server-fetchplus = mcp_server_fetchplus.server:main

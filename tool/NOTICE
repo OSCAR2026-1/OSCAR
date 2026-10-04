@@ -1,0 +1,11 @@
+OSCAR
+Cross-layer runtime effect analysis for known OSS vulnerabilities in agent systems
+
+Copyright 2026 OSCAR Authors
+
+If you use OSCAR in academic work, please cite the accompanying paper.
+
+The Apache License 2.0 applies only to OSCAR material for which the OSCAR
+Authors hold the necessary rights. Third-party benchmark assets, upstream
+source code, vulnerability fixtures, patches, container layers, and datasets
+remain subject to their respective licenses and notices.

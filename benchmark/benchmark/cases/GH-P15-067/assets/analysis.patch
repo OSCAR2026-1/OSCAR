@@ -1,0 +1,145 @@
+--- a/server/fastmcp/server.py
++++ b/server/fastmcp/server.py
+@@ -42,7 +42,11 @@
+ from mcp.server.elicitation import (
+     ElicitationResult,
+     ElicitSchemaModelT,
++    UrlElicitationResult,
+     elicit_with_validation,
++)
++from mcp.server.elicitation import (
++    elicit_url as _elicit_url,
+ )
+ from mcp.server.fastmcp.exceptions import ResourceError
+ from mcp.server.fastmcp.prompts import Prompt, PromptManager
+@@ -149,6 +153,7 @@
+         auth_server_provider: (OAuthAuthorizationServerProvider[Any, Any, Any] | None) = None,
+         token_verifier: TokenVerifier | None = None,
+         event_store: EventStore | None = None,
++        retry_interval: int | None = None,
+         *,
+         tools: list[Tool] | None = None,
+         debug: bool = False,
+@@ -169,6 +174,14 @@
+         auth: AuthSettings | None = None,
+         transport_security: TransportSecuritySettings | None = None,
+     ):
++        # Auto-enable DNS rebinding protection for localhost (IPv4 and IPv6)
++        if transport_security is None and host in ("127.0.0.1", "localhost", "::1"):
++            transport_security = TransportSecuritySettings(
++                enable_dns_rebinding_protection=True,
++                allowed_hosts=["127.0.0.1:*", "localhost:*", "[::1]:*"],
++                allowed_origins=["http://127.0.0.1:*", "http://localhost:*", "http://[::1]:*"],
++            )
++
+         self.settings = Settings(
+             debug=debug,
+             log_level=log_level,
+@@ -217,6 +230,7 @@
+         if auth_server_provider and not token_verifier:  # pragma: no cover
+             self._token_verifier = ProviderTokenVerifier(auth_server_provider)
+         self._event_store = event_store
++        self._retry_interval = retry_interval
+         self._custom_starlette_routes: list[Route] = []
+         self.dependencies = self.settings.dependencies
+         self._session_manager: StreamableHTTPSessionManager | None = None
+@@ -697,6 +711,10 @@
+         The handler function must be an async function that accepts a Starlette
+         Request and returns a Response.
+ 
++        Routes using this decorator will not require authorization. It is intended
++        for uses that are either a part of authorization flows or intended to be
++        public such as health check endpoints.
++
+         Args:
+             path: URL path for the route (e.g., "/oauth/callback")
+             methods: List of HTTP methods to support (e.g., ["GET", "POST"])
+@@ -932,6 +950,7 @@
+             self._session_manager = StreamableHTTPSessionManager(
+                 app=self._mcp_server,
+                 event_store=self._event_store,
++                retry_interval=self._retry_interval,
+                 json_response=self.settings.json_response,
+                 stateless=self.settings.stateless_http,  # Use the stateless setting
+                 security_settings=self.settings.transport_security,
+@@ -1200,6 +1219,41 @@
+             related_request_id=self.request_id,
+         )
+ 
++    async def elicit_url(
++        self,
++        message: str,
++        url: str,
++        elicitation_id: str,
++    ) -> UrlElicitationResult:
++        """Request URL mode elicitation from the client.
++
++        This directs the user to an external URL for out-of-band interactions
++        that must not pass through the MCP client. Use this for:
++        - Collecting sensitive credentials (API keys, passwords)
++        - OAuth authorization flows with third-party services
++        - Payment and subscription flows
++        - Any interaction where data should not pass through the LLM context
++
++        The response indicates whether the user consented to navigate to the URL.
++        The actual interaction happens out-of-band. When the elicitation completes,
++        call `self.session.send_elicit_complete(elicitation_id)` to notify the client.
++
++        Args:
++            message: Human-readable explanation of why the interaction is needed
++            url: The URL the user should navigate to
++            elicitation_id: Unique identifier for tracking this elicitation
++
++        Returns:
++            UrlElicitationResult indicating accept, decline, or cancel
++        """
++        return await _elicit_url(
++            session=self.request_context.session,
++            message=message,
++            url=url,
++            elicitation_id=elicitation_id,
++            related_request_id=self.request_id,
++        )
++
+     async def log(
+         self,
+         level: Literal["debug", "info", "warning", "error"],
+@@ -1239,6 +1293,38 @@
+         """Access to the underlying session for advanced usage."""
+         return self.request_context.session
+ 
++    async def close_sse_stream(self) -> None:
++        """Close the SSE stream to trigger client reconnection.
++
++        This method closes the HTTP connection for the current request, triggering
++        client reconnection. Events continue to be stored in the event store and will
++        be replayed when the client reconnects with Last-Event-ID.
++
++        Use this to implement polling behavior during long-running operations -
++        client will reconnect after the retry interval specified in the priming event.
++
++        Note:
++            This is a no-op if not using StreamableHTTP transport with event_store.
++            The callback is only available when event_store is configured.
++        """
++        if self._request_context and self._request_context.close_sse_stream:  # pragma: no cover
++            await self._request_context.close_sse_stream()
++
++    async def close_standalone_sse_stream(self) -> None:
++        """Close the standalone GET SSE stream to trigger client reconnection.
++
++        This method closes the HTTP connection for the standalone GET stream used
++        for unsolicited server-to-client notifications. The client SHOULD reconnect
++        with Last-Event-ID to resume receiving notifications.
++
++        Note:
++            This is a no-op if not using StreamableHTTP transport with event_store.
++            Currently, client reconnection for standalone GET streams is NOT
++            implemented - this is a known gap.
++        """
++        if self._request_context and self._request_context.close_standalone_sse_stream:  # pragma: no cover
++            await self._request_context.close_standalone_sse_stream()
++
+     # Convenience methods for common log levels
+     async def debug(self, message: str, **extra: Any) -> None:
+         """Send a debug log message."""

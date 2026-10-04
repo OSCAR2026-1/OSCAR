@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vulveil-localization/v1",
+  "title": "OSCAR Stage 1 localization",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "case_identity",
+    "anchor_candidates",
+    "repair_predicate",
+    "source_evidence",
+    "patch_evidence",
+    "unresolved_reasons",
+    "localization_digest"
+  ],
+  "anyOf": [
+    {"required": ["vulnerability_component"]},
+    {"required": ["direct_runtime_dependency"]}
+  ],
+  "properties": {
+    "schema_version": {"const": "vulveil-localization/v1"},
+    "status": {"enum": ["LOCALIZED", "PARTIAL", "UNASSESSED", "INVALID"]},
+    "case_identity": {"type": "object"},
+    "component_origin": {"enum": ["MCP_SERVER_SELF", "DIRECT_RUNTIME_DEPENDENCY", "MCP_FRAMEWORK"]},
+    "vulnerability_component": {
+      "type": "object",
+      "properties": {
+        "origin": {"enum": ["MCP_SERVER_SELF", "DIRECT_RUNTIME_DEPENDENCY", "MCP_FRAMEWORK"]},
+        "name": {"type": "string", "minLength": 1},
+        "purl": {"type": ["string", "null"], "pattern": "^pkg:"},
+        "repository": {"type": ["string", "null"], "minLength": 1},
+        "vulnerable_version": {"type": ["string", "null"], "minLength": 1},
+        "fixed_version": {"type": ["string", "null"], "minLength": 1},
+        "vulnerable_commit": {"type": ["string", "null"], "minLength": 1},
+        "fixed_commit": {"type": ["string", "null"], "minLength": 1},
+        "dependency_depth": {"const": 1},
+        "dependency_scope": {"const": "runtime"},
+        "relation_status": {"enum": ["AFFECTED_EXACT_COMPONENT", "AFFECTED_COMMIT_COMPONENT"]},
+        "source_evidence": {"type": ["array", "string", "object"], "items": {"oneOf": [{"type": "string"}, {"type": "object"}]}},
+        "patch_evidence": {"type": ["array", "string", "object"], "items": {"oneOf": [{"type": "string"}, {"type": "object"}]}},
+        "advisory_evidence": {
+          "type": ["object", "null"],
+          "required": ["advisory_id", "source", "component", "vulnerable", "fixed", "affected", "source_refs", "patch_refs"],
+          "properties": {
+            "advisory_id": {"type": "string", "pattern": "^(CVE|GHSA|PYSEC|OSV)-"},
+            "aliases": {"type": "array", "items": {"type": "string"}},
+            "source": {"type": "object", "required": ["kind", "url", "record"], "properties": {"kind": {"enum": ["OSV", "PUBLIC_ADVISORY", "UPSTREAM_ADVISORY"]}, "url": {"type": "string", "pattern": "^https://"}, "record": {"type": "object", "required": ["id", "component", "vulnerable", "fixed", "affected"], "properties": {"id": {"type": "string"}, "aliases": {"type": "array", "items": {"type": "string"}}, "component": {"type": "object", "required": ["name"]}, "vulnerable": {"type": "object"}, "fixed": {"type": "object"}, "affected": {"type": "object"}}}}},
+            "component": {"type": "object", "required": ["name"], "properties": {"name": {"type": "string"}, "purl": {"type": "string", "pattern": "^pkg:"}, "repository": {"type": "string"}}},
+            "vulnerable": {"type": "object"},
+            "fixed": {"type": "object"},
+            "affected": {"type": "object"},
+            "source_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+            "patch_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+          },
+          "additionalProperties": true
+        }
+      },
+      "anyOf": [
+        {"maxProperties": 0},
+        {
+          "required": ["origin", "name", "relation_status", "source_evidence", "patch_evidence"],
+          "allOf": [
+            {"anyOf": [{"required": ["purl"]}, {"required": ["repository"]}]},
+            {"anyOf": [{"required": ["vulnerable_version"]}, {"required": ["vulnerable_commit"]}]},
+            {"anyOf": [{"required": ["fixed_version"]}, {"required": ["fixed_commit"]}]},
+            {"if": {"properties": {"origin": {"const": "DIRECT_RUNTIME_DEPENDENCY"}}}, "then": {"required": ["dependency_depth", "dependency_scope"]}}
+          ]
+        }
+      ],
+      "additionalProperties": true
+    },
+    "direct_runtime_dependency": {"type": "object"},
+    "anchor_candidates": {"type": "array", "items": {"type": "object"}},
+    "repair_predicate": {
+      "type": "object",
+      "required": ["schema_version", "kind", "anchor_ids", "patch_refs", "conditions", "checkers", "path_constraints", "blocking_obligations", "classification_status", "dynamic_checks", "fixed_side_validation", "fixed_side_blocked", "conditions_added_or_changed"],
+      "properties": {
+        "schema_version": {"const": "vulveil-repair-predicate/v2"},
+        "kind": {"const": "patch-scoped-repair-predicate"},
+        "anchor_ids": {"type": "array", "items": {"type": "string"}},
+        "patch_refs": {"type": "array", "items": {"type": "string"}},
+        "conditions_added_or_changed": {"type": "array"},
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["condition_id", "kind", "side", "source_ref", "expression", "normalized_form", "patch_refs", "evidence_refs", "classification_status"],
+            "properties": {
+              "condition_id": {"type": "string"},
+              "kind": {"enum": ["added_guard", "removed_guard", "changed_call", "changed_argument", "changed_return", "added_type_check", "added_boundary_check", "added_normalization", "added_sanitization", "changed_exception_behavior", "changed_resource_operation", "structural_difference"]},
+              "side": {"enum": ["vulnerable", "fixed"]},
+              "function": {"type": ["string", "null"]},
+              "source_ref": {"type": "string"},
+              "anchor_id": {"type": ["string", "null"]},
+              "expression": {"type": "string"},
+              "normalized_form": {"type": "string"},
+              "patch_refs": {"type": "array", "items": {"type": "string"}},
+              "evidence_refs": {"type": "array", "items": {"type": "string"}},
+              "classification_status": {"enum": ["SUPPORTED", "UNRESOLVED"]},
+              "checker_id": {"type": "string"}
+            },
+            "additionalProperties": true
+          }
+        },
+        "checkers": {"type": "array", "items": {"type": "object"}},
+        "path_constraints": {"type": "array", "items": {"type": "object"}},
+        "blocking_obligations": {"type": "array", "items": {"type": "object"}},
+        "classification_status": {"enum": ["SUPPORTED", "PARTIAL", "UNRESOLVED"]},
+        "dynamic_checks": {"type": "object"},
+        "fixed_side_validation": {"type": "object"},
+        "fixed_side_blocked": {"type": ["boolean", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "source_evidence": {"type": "array", "items": {"type": ["string", "object"]}},
+    "patch_evidence": {"type": "array", "items": {"type": ["string", "object"]}},
+    "unresolved_reasons": {"type": "array", "items": {"type": "string"}},
+    "localization_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

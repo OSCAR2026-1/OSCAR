@@ -1,0 +1,92 @@
+{
+  "schema_version": "vulveil-blind-case/v1",
+  "case_id": "cli-fixture-case",
+  "identity": {
+    "advisory": "CVE-CLI-FIXTURE-0001",
+    "package": "fixture-package",
+    "vulnerable_version": "1.0.0",
+    "fixed_version": "1.0.1"
+  },
+  "server": {
+    "repository": "fixture/repository",
+    "module": "fixture.server",
+    "commit": "fixture-commit"
+  },
+  "direct_runtime_dependency": {
+    "dependency_name": "fixture-package",
+    "dependency_purl": "pkg:pypi/fixture-package",
+    "dependency_depth": 1,
+    "dependency_scope": "runtime",
+    "vulnerable_version": "1.0.0",
+    "fixed_version": "1.0.1",
+    "relation_status": "affected_exact_direct_runtime"
+  },
+  "dependencies": {
+    "vulnerable": "fixture-dependency@1.0.0",
+    "fixed": "fixture-dependency@1.0.1"
+  },
+  "tool": {
+    "name": "probe",
+    "configuration": {
+      "transport": "stdio"
+    }
+  },
+  "agent_task": "Run the frozen fixture task.",
+  "tool_input": {
+    "value": "frozen"
+  },
+  "host_profile": {
+    "id": "fixture-host",
+    "model": "fixture-model",
+    "tool_configuration": "fixed"
+  },
+  "environment": {
+    "package_manager": "python",
+    "lockfile": ""
+  },
+  "external_boundary": {
+    "kind": "local-fixture",
+    "initial_state": "empty"
+  },
+  "source": {
+    "vulnerable": [{
+      "path": "probe.py",
+      "content": "import fixture_package\n@mcp.tool(\"probe\")\ndef probe(value):\n    return fixture_package.execute(value, shell=True)\n"
+    }],
+    "fixed": [{
+      "path": "probe.py",
+      "content": "import fixture_package\n@mcp.tool(\"probe\")\ndef probe(value):\n    if not isinstance(value, str):\n        raise ValueError(\"rejected\")\n    return fixture_package.execute([\"echo\", value], shell=False)\n"
+    }]
+  },
+  "patch": {
+    "unified_diff": "--- a/probe.py\n+++ b/probe.py\n@@ -1,3 +1,6 @@\n-import subprocess\n+import fixture_package\n+@mcp.tool(\"probe\")\n def probe(value):\n+    if not isinstance(value, str):\n+        raise ValueError(\"rejected\")\n-    return subprocess.check_output(value, shell=True)\n+    return fixture_package.execute([\"echo\", value], shell=False)\n"
+  },
+  "random_seed": 7,
+  "runner": {
+    "repetitions": 2,
+    "dynamic_budget": 2,
+    "counterfactual_input_mode": "env-json/v1",
+    "counterfactual_budget": 3,
+    "timeout_seconds": 30,
+    "vulnerable": {
+      "command": ["python3", "tests/fixtures/emit_blind_evidence.py"],
+      "cwd": ".",
+      "env": {
+        "VULVEIL_SIGNAL": "fixture-effect"
+      },
+      "evidence_file": "blind_evidence.jsonl"
+    },
+    "patched": {
+      "command": ["python3", "tests/fixtures/emit_blind_evidence.py"],
+      "cwd": ".",
+      "env": {
+        "VULVEIL_SIGNAL": "fixture-effect"
+      },
+      "evidence_file": "blind_evidence.jsonl"
+    }
+  },
+  "effect_modeling": {
+    "schema_version": "vulveil-effect-model/v3",
+    "requires_source_patch_trace": true
+  }
+}

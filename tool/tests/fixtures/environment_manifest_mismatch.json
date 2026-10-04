@@ -1,0 +1,7 @@
+{
+  "schema_version": "vulveil-frozen-environment/v1",
+  "tool_input": {
+    "value": "different"
+  },
+  "manifest_sha256": "fixture-mismatch"
+}

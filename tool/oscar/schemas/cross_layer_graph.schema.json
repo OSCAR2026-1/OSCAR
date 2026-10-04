@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vulveil-cross-layer-graph/v3",
+  "type": "object",
+  "required": ["schema_version", "graph_id", "case_identity", "status", "localization_digest", "effect_model_digest", "effect_ids", "effect_relations", "nodes", "edges", "parity", "effect_observation", "effect_path_status", "unresolved_boundaries", "graph_validation"],
+  "properties": {
+    "schema_version": {"const": "vulveil-cross-layer-graph/v3"},
+    "graph_id": {"type": "string"},
+    "case_identity": {"type": "object"},
+    "component_origin": {"enum": ["MCP_SERVER_SELF", "DIRECT_RUNTIME_DEPENDENCY", "MCP_FRAMEWORK"]},
+    "vulnerability_component": {
+      "type": "object",
+      "properties": {
+        "origin": {"enum": ["MCP_SERVER_SELF", "DIRECT_RUNTIME_DEPENDENCY", "MCP_FRAMEWORK"]},
+        "name": {"type": "string", "minLength": 1},
+        "purl": {"type": "string", "pattern": "^pkg:"},
+        "repository": {"type": "string", "minLength": 1},
+        "vulnerable_version": {"type": "string"},
+        "fixed_version": {"type": "string"},
+        "source_evidence": {"type": ["array", "string", "object"]},
+        "patch_evidence": {"type": ["array", "string", "object"]},
+        "advisory_evidence": {"type": "object", "properties": {"source": {"type": "object", "properties": {"record": {"type": "object", "required": ["id", "component", "vulnerable", "fixed", "affected"]}}}}},
+        "relation_status": {"enum": ["AFFECTED_EXACT_COMPONENT", "AFFECTED_COMMIT_COMPONENT", "affected_exact_direct_runtime", "affected_commit_direct_runtime"]}
+      }
+    },
+    "status": {"enum": ["COMPLETE", "PARTIAL", "UNASSESSED", "INVALID"]},
+    "localization_digest": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "effect_model_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "effect_ids": {"type": "array", "items": {"type": "string"}},
+    "effect_relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "relation", "evidence_refs", "provenance_status"],
+        "properties": {
+          "from": {"type": "string"},
+          "to": {"type": "string"},
+          "relation": {"enum": ["CAUSES", "PRODUCES", "DERIVES", "DERIVES_VALUE", "ENABLES", "BLOCKS", "PROPAGATES_TO", "ALIGNS_WITH"]},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}},
+          "provenance_status": {"enum": ["SUPPORTED", "PARTIAL", "UNRESOLVED", "UNASSESSED"]}
+        }
+      }
+    },
+    "stage1_anchor_refs": {"type": "array", "items": {"type": "object"}},
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["node_id", "layer", "kind", "side", "identity", "effect_ids"],
+        "properties": {
+          "layer": {"enum": ["EXECUTION", "EFFECT", "PROGRAM_DEPENDENCY", "PROGRAM_SERVER", "MCP", "PROTOCOL_HOST", "AGENT_OBSERVATION", "EXTERNAL_RESOURCE"]},
+          "kind": {"enum": ["function", "call_site", "parameter", "return_value", "variable", "branch", "exception", "file", "network_response", "command", "tool_argument", "tool_result_field", "json_rpc_field", "host_normalized_field", "session_event", "model_request_message", "exact_l4_content_block", "resource", "mcp_tool", "input_schema", "dependency", "vulnerability_component", "vulnerability_anchor", "effect_instance", "control_state", "program_value", "resource_state", "resource_event", "readback_value", "agent_task", "tool_call", "tool_handler"]},
+          "side": {"enum": ["vulnerable", "fixed", "both", null]},
+          "effect_ids": {"type": "array", "items": {"type": "string"}},
+          "dynamic": {"type": "object"},
+          "boundary_level": {"type": "string"},
+          "boundary_kind": {"enum": ["RAW_TOOL_RESULT", "MCP_PROTOCOL_FIELD", "HOST_PROCESSED_RESULT", "SESSION_MESSAGE", "EXACT_L4_CONTENT"]}
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["edge_id", "source", "target", "kind", "side", "field_mapping", "effect_ids", "evidence_refs", "confidence", "plane", "status"],
+        "properties": {
+          "kind": {"enum": ["CALL", "CALLS", "RETURN", "RETURNS", "DATA", "CONTROL", "BIND", "BINDS", "TASK_INVOKES", "PASSES_ARGUMENT", "PRODUCES", "CARRIED_BY", "DERIVES_VALUE", "READS_RESOURCE", "WRITES_RESOURCE", "SERIALIZE", "SERIALIZES", "DESERIALIZE", "STATE_WRITE", "STATE_READ", "FILTER", "FILTERS", "TRANSFORM", "TRANSFORMS", "PRESERVES", "PROJECTS_TO_SESSION", "OBSERVE", "OBSERVES", "CAUSES", "DERIVES", "BLOCKS", "ALIGNS_WITH"]},
+          "field_mapping": {"type": "object"},
+          "effect_ids": {"type": "array", "items": {"type": "string"}},
+          "carrier_effect_ids": {"type": "array", "items": {"type": "string"}},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+          "dynamic_provenance": {"type": "boolean"},
+          "transport_observed": {"type": "boolean"},
+          "effect_carrier_observed": {"type": "boolean"},
+          "effect_value_linked": {"type": "boolean"},
+          "exact_l4_observed": {"type": "boolean"},
+          "transformation": {"type": "object"},
+          "plane": {"enum": ["EXECUTION", "EFFECT", "ALIGNMENT"]},
+          "status": {"enum": ["PRESERVED", "TRANSFORMED", "DROPPED", "UNASSESSED"]}
+        }
+      }
+    },
+    "parity": {"type": "object", "required": ["tool_input_digest", "host_profile_digest", "environment_digest"]},
+    "effect_observation": {"type": "object"},
+    "effect_path_status": {"type": "object"},
+    "alignment": {"type": "object"},
+    "repair_alignment": {"type": "object"},
+    "unresolved_boundaries": {"type": "array", "items": {"type": "string"}},
+    "diagnostic_unresolved_boundaries": {"type": "array", "items": {"type": "string"}},
+    "graph_validation": {
+      "type": "object",
+      "required": ["status", "errors"],
+      "properties": {
+        "status": {"enum": ["OK", "ERROR", "UNASSESSED"]},
+        "errors": {"type": "array", "items": {"type": "string"}}
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+ddgs
+requests
+python-dotenv
+trafilatura
+
+# fetch fallbacks
+readability-lxml
+newspaper4k
+
+# table extraction
+pandas
+lxml
+tabulate
+
+# ranking
+rank-bm25
+
+# optional: semantic reranking (bi-encoder + cross-encoder)
+# sentence-transformers
+
+# extract - install only the providers you use
+# anthropic              # ClaudeExtractor
+# openai                 # GPTExtractor
+google-generativeai      # GeminiExtractor (free tier)
+groq                     # GroqExtractor (free tier, fastest)
+
+# PDF datasheets
+pdfplumber
+
+# optional: JS-rendered pages (pip install playwright separately, then: playwright install chromium)
+# playwright

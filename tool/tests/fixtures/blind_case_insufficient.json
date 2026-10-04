@@ -1,0 +1,38 @@
+{
+  "schema_version": "vulveil-blind-case/v1",
+  "case_id": "cli-fixture-insufficient",
+  "identity": {
+    "advisory": "CVE-CLI-FIXTURE-INSUFFICIENT",
+    "package": "fixture-package",
+    "vulnerable_version": "1.0.0",
+    "fixed_version": "1.0.1"
+  },
+  "server": {
+    "repository": "fixture/repository",
+    "module": "fixture.server"
+  },
+  "tool": {"name": "probe", "configuration": {"transport": "stdio"}},
+  "agent_task": "Run the frozen fixture task.",
+  "tool_input": {"value": "frozen"},
+  "host_profile": {"id": "fixture-host", "model": "fixture-model"},
+  "environment": {"package_manager": "python", "lockfile": ""},
+  "external_boundary": {"kind": "local-fixture", "initial_state": "empty"},
+  "random_seed": 7,
+  "runner": {
+    "repetitions": 1,
+    "dynamic_budget": 1,
+    "timeout_seconds": 30,
+    "vulnerable": {
+      "command": ["python3", "tests/fixtures/emit_blind_evidence.py"],
+      "cwd": ".",
+      "env": {},
+      "evidence_file": "blind_evidence.jsonl"
+    },
+    "patched": {
+      "command": ["python3", "tests/fixtures/emit_blind_evidence.py"],
+      "cwd": ".",
+      "env": {},
+      "evidence_file": "blind_evidence.jsonl"
+    }
+  }
+}

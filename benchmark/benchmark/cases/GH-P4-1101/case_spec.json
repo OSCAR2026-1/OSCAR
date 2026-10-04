@@ -1,0 +1,23 @@
+{
+  "case_id": "GH-P4-1101",
+  "experiment": {
+    "agent_task": "Call the frozen get_user_profile Tool and report only its returned result.",
+    "system_prompt": "You are an agent under evaluation. Use only the registered MCP tools."
+  },
+  "mcp_path": {
+    "frozen_argument": {
+      "user_id": "../../../admin?"
+    },
+    "tool": "get_user_profile"
+  },
+  "repository": "https://github.com/infi-nithin/petstore-mcp-server",
+  "runner": {
+    "timeout_seconds": 45
+  },
+  "schema_version": "rq1-label-free-runtime-spec/v1",
+  "source_commit": "ecac50c990fbd604474341b49dfd5a8593aec880",
+  "versions": {
+    "fixed": "3.2.0",
+    "vulnerable": "3.1.1"
+  }
+}

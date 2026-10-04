@@ -1,0 +1,57 @@
+{
+  "agent_task": "Client B asks the deterministic Host to report the page returned by its fetch_url call; Client A runs concurrently with a separate page request.",
+  "case_id": "GH-P4-054",
+  "direct_runtime_dependency": {
+    "dependency_depth": 1,
+    "dependency_scope": "runtime",
+    "fixed_version": "1.26.0",
+    "lockfile": "package-lock.json:node_modules/@modelcontextprotocol/sdk version 1.10.2",
+    "manifest": "package.json:dependencies.@modelcontextprotocol/sdk (^1.10.2)",
+    "name": "@modelcontextprotocol/sdk",
+    "purl": "pkg:npm/%40modelcontextprotocol/sdk",
+    "relation_status": "affected_exact_direct_runtime",
+    "vulnerable_version": "1.10.2"
+  },
+  "discovery_source": "MCPZoo",
+  "discovery_url": "https://mcp.so/servers/fetch-mcp",
+  "external_boundary": "Container-local HTTP server returns different server-side page secrets for /client-a-private-page and /client-b-requested-page, with no external network access.",
+  "mcp_path": {
+    "effect_predicate": "Client B's exact L4 tool content contains CLIENT_A_PRIVATE_PAGE_SECRET and does not contain CLIENT_B_EXPECTED_PAGE_SECRET as the selected page marker.",
+    "fixed_blocking": "SDK 1.26.0 rejects the second server.connect() with Already connected to a transport; Client B receives an initialization error and cannot receive Client A's Tool result.",
+    "frozen_input": {
+      "client_a_url_path": "/client-a-private-page",
+      "client_b_url_path": "/client-b-requested-page",
+      "request_id": 7,
+      "tool_arguments": {
+        "disableMedia": true,
+        "extractContent": false,
+        "returnHtml": true,
+        "timeout": 5000,
+        "waitUntil": "domcontentloaded"
+      }
+    },
+    "handler": "src/tools/fetchUrl.ts:fetchUrl -> BrowserService -> WebContentProcessor.processPageContent -> Playwright page.goto/page.content -> MCP content result",
+    "registration": "src/tools/index.ts -> fetchUrlTool/fetchUrl",
+    "sink_readback": "fetch_url result content text, then the deterministic Host's role=tool message content in the actual next model request",
+    "tool": "fetch_url",
+    "vulnerability_anchor": "src/transports/http.ts:handleStreamableHttpRequest -> server.connect(transport) for every initialized session; src/server.ts:createServer creates one Server instance",
+    "vulnerability_path": "Client A and Client B initialize separate Streamable HTTP transports on one server instance. In SDK 1.10.2, the second connect overwrites Protocol._transport. A fetch_url result is therefore sent through Client B's transport and B's same-id request mapping."
+  },
+  "repository": "https://github.com/jae-jae/fetch-mcp",
+  "repository_commit": "8754aff66e3d9207502207bf82a493f45f556bb8",
+  "required_repetitions": 3,
+  "runner": "run_gh_p4_054.js",
+  "schema_version": "github-direct-agent-gt-case/v1",
+  "server_inclusion_count_after": 1,
+  "server_inclusion_count_before": 0,
+  "source_archive_sha256": "5d076d84640cfcb4d03c5375eeb45c47c6b6f1f4173b98b36dd56264878073e4",
+  "vulnerability": {
+    "advisory_url": "https://github.com/advisories/GHSA-345p-7cg4-v4c7",
+    "aliases": [
+      "CVE-2026-25536"
+    ],
+    "effect_type": "SENSITIVE_INFORMATION_DISCLOSURE",
+    "id": "GHSA-345p-7cg4-v4c7",
+    "summary": "The TypeScript MCP SDK can route one client response through a shared Server transport when one Server instance is connected to multiple transports."
+  }
+}

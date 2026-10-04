@@ -1,0 +1,156 @@
+{
+  "schema_version": "vulveil-test-set/v1",
+  "case_count": 50,
+  "cases": [
+    {
+      "case": "benchmark/cases/CVE-2022-33987/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/CVE-2024-47081-zilliz/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/CVE-2025-62718-markdown/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/CVE-2025-62718-sun-image/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/CVE-2026-33989/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P10-024/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P10-025/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P10-028/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P15-067/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P2-002/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P3-009-rest-mcp-requests-netrc/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P3-032-fetch-guard-requests-netrc/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P3-063-rss-mcp-axios-no-proxy/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P3-093-datris-mcp-requests-netrc/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P3-119-bitbucket-server-mcp-axios-no-proxy/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P4-002/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P4-054/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P4-1101/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P4-111/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P5-045/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P5-046/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P5-067/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/GH-P5-071/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-001/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-002/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-003/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-004/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-005/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-006/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-007/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-008/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-009/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-010/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-011/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-012/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-013/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-014/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-015/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-016/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-017/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-018/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-019/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-020/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-021/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-022/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-023/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-024/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-025/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-026/blind_case.json"
+    },
+    {
+      "case": "benchmark/cases/RQ1X-027/blind_case.json"
+    }
+  ]
+}

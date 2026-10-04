@@ -1,0 +1,11 @@
+{
+  "profile_id": "rq1-evaluation-sanitized-projection/v1",
+  "projection": {
+    "actual_name": "markdown",
+    "drop": "markdown",
+    "expected_name": "content",
+    "input": "structuredContent.result",
+    "kind": "field_alias_drop"
+  },
+  "schema_version": "rq1-label-free-host-profile/v1"
+}

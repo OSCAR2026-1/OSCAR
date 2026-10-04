@@ -1,0 +1,11 @@
+mcp
+requests
+beautifulsoup4
+html2markdown
+python-dotenv
+pydantic-settings
+
+[dev]
+pytest
+black
+isort

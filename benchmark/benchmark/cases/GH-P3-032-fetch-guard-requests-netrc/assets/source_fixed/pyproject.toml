@@ -1,0 +1,87 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fetch-guard"
+version = "1.4.0"
+description = "Fetch URLs and return clean, LLM-ready markdown with metadata and prompt injection defense"
+requires-python = ">=3.10"
+license = "MIT"
+readme = "README.md"
+authors = [
+    { name = "Owen Sterling", email = "owen@erodenn.com" },
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Text Processing :: Markup :: HTML",
+]
+
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "trafilatura",
+    "extruct",
+    "mcp",
+]
+
+[project.scripts]
+fetch-guard = "fetch_guard.server:main"
+fetch-guard-cli = "fetch_guard.cli:main"
+
+[project.optional-dependencies]
+js = [
+    "playwright",
+]
+dev = [
+    "pytest",
+    "ruff",
+    "pyyaml",
+]
+[project.urls]
+Homepage = "https://github.com/Erodenn/fetch-guard"
+Repository = "https://github.com/Erodenn/fetch-guard"
+Issues = "https://github.com/Erodenn/fetch-guard/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
+addopts = "-m 'not live'"
+markers = [
+    "live: hits real network (excluded by default)",
+    "js: requires Playwright for JS rendering",
+]
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+src = ["fetch_guard", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "W",    # pycodestyle warnings
+    "I",    # isort
+    "UP",   # pyupgrade
+    "N",    # pep8-naming
+    "S",    # flake8-bandit (security)
+    "B",    # flake8-bugbear
+    "A",    # flake8-builtins
+    "C4",   # flake8-comprehensions
+    "SIM",  # flake8-simplify
+    "PIE",  # flake8-pie
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["S101"]  # allow assert in tests
+"fetch_guard/cli.py" = ["E402"]  # imports after dependency check
+"fetch_guard/server.py" = ["E402"]  # imports after dependency check
+"fetch_guard/http/__init__.py" = ["A005"]  # http subpackage shadows stdlib — scoped under fetch_guard

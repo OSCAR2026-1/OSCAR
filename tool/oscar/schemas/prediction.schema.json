@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vulveil.local/schemas/prediction-v2.json",
+  "title": "OSCAR blind prediction v2",
+  "type": "object",
+  "required": [
+    "schema_version", "case_identity", "run_status", "predicted_impact",
+    "impact_status", "impact_effect_ids", "effect_realized",
+    "maximum_effect_boundary", "agent_visible", "predicted_reachability",
+    "impact_reason", "repetition_policy", "per_effect"
+  ],
+  "$defs": {
+    "boundary": {
+      "enum": [
+        "PRESENT_ONLY", "VULNERABILITY_ANCHOR", "SERVER_OR_EXTERNAL_EFFECT",
+        "L0_RAW_MCP_RESULT", "L1_NORMALIZED_TOOL_RESULT",
+        "L2_HOST_PROCESSED_TOOL_RESULT", "L3_SESSION_TOOL_RESULT",
+        "L4_MODEL_VISIBLE_OBSERVATION", "UNASSESSED"
+      ]
+    },
+    "evidenceRefs": {
+      "type": "array", "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "vulnerableBinding": {
+      "type": "object",
+      "required": [
+        "effect_id", "repetition", "pair_identity", "valid",
+        "realization_status", "maximum_effect_boundary", "evidence_refs"
+      ],
+      "properties": {
+        "effect_id": {"type": "string", "minLength": 1},
+        "repetition": {"type": "integer", "minimum": 1},
+        "pair_identity": {"type": "string", "minLength": 1},
+        "valid": {"const": true},
+        "realization_status": {"enum": ["REALIZED", "NOT_REALIZED", "UNASSESSED"]},
+        "maximum_effect_boundary": {"$ref": "#/$defs/boundary"},
+        "evidence_refs": {"$ref": "#/$defs/evidenceRefs"}
+      },
+      "additionalProperties": false
+    },
+    "fixedBinding": {
+      "type": "object",
+      "required": [
+        "effect_id", "repetition", "pair_identity", "valid", "timed_out",
+        "effect_status", "blocking_reason", "evidence_refs"
+      ],
+      "properties": {
+        "effect_id": {"type": "string", "minLength": 1},
+        "repetition": {"type": "integer", "minimum": 1},
+        "pair_identity": {"type": "string", "minLength": 1},
+        "valid": {"const": true},
+        "timed_out": {"const": false},
+        "effect_status": {"enum": ["BLOCKED", "NOT_REALIZED", "REALIZED", "UNASSESSED"]},
+        "blocking_reason": {"type": ["string", "null"]},
+        "evidence_refs": {"$ref": "#/$defs/evidenceRefs"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "properties": {
+    "schema_version": {"const": "vulveil-prediction/v2"},
+    "case_identity": {"type": "object"},
+    "run_status": {"enum": ["VALID", "INVALID", "BLOCKED", "UNASSESSED"]},
+    "predicted_impact": {"type": ["boolean", "null"]},
+    "impact_status": {"enum": ["IMPACT_YES", "IMPACT_NO", "UNASSESSED"]},
+    "impact_effect_ids": {
+      "type": "array", "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "effect_realized": {"type": ["boolean", "null"]},
+    "maximum_effect_boundary": {"$ref": "#/$defs/boundary"},
+    "predicted_boundary_class": {"enum": ["B_ENV", "B_TOOL", "B_AGENT", null]},
+    "agent_visible": {"type": ["boolean", "null"]},
+    "predicted_reachability": {"type": ["boolean", "null"]},
+    "impact_reason": {"type": "string"},
+    "repetition_policy": {
+      "type": "object",
+      "required": [
+        "schema_version", "minimum_paired_repetitions", "vulnerable_repetitions",
+        "fixed_repetitions", "all_runs_valid_and_paired"
+      ],
+      "properties": {
+        "schema_version": {"const": "vulveil-impact-repetitions/v1"},
+        "minimum_paired_repetitions": {"const": 3},
+        "vulnerable_repetitions": {"type": "integer", "minimum": 0},
+        "fixed_repetitions": {"type": "integer", "minimum": 0},
+        "all_runs_valid_and_paired": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "per_effect": {
+      "type": "object",
+      "propertyNames": {"type": "string", "minLength": 1},
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "realization_status", "consequence_role", "patch_attribution",
+          "maximum_effect_boundary", "first_nonpropagation_transition",
+          "agent_visible", "stable_across_repetitions",
+          "vulnerable_repetition_bindings", "fixed_repetition_bindings", "evidence_refs"
+        ],
+        "properties": {
+          "effect_kind": {"type": ["string", "null"]},
+          "realization_status": {"enum": ["REALIZED", "NOT_REALIZED", "UNASSESSED"]},
+          "consequence_role": {"enum": ["CONCRETE", "INTERMEDIATE", "UNRESOLVED"]},
+          "patch_attribution": {"enum": ["SUPPORTED", "NOT_SUPPORTED", "UNASSESSED"]},
+          "maximum_effect_boundary": {"$ref": "#/$defs/boundary"},
+          "first_nonpropagation_transition": {"type": ["string", "null"]},
+          "agent_visible": {"type": "boolean"},
+          "stable_across_repetitions": {"type": "boolean"},
+          "vulnerable_repetition_bindings": {
+            "type": "array", "minItems": 1, "items": {"$ref": "#/$defs/vulnerableBinding"}
+          },
+          "fixed_repetition_bindings": {
+            "type": "array", "minItems": 1, "items": {"$ref": "#/$defs/fixedBinding"}
+          },
+          "evidence_refs": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"run_status": {"const": "VALID"}}, "required": ["run_status"]},
+      "then": {},
+      "else": {
+        "properties": {
+          "predicted_impact": {"type": "null"},
+          "predicted_reachability": {"type": "null"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"impact_status": {"const": "IMPACT_YES"}}, "required": ["impact_status"]},
+      "then": {
+        "properties": {
+          "predicted_impact": {"const": true},
+          "effect_realized": {"const": true},
+          "impact_effect_ids": {"minItems": 1},
+          "per_effect": {"minProperties": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"impact_status": {"const": "IMPACT_NO"}}, "required": ["impact_status"]},
+      "then": {
+        "properties": {
+          "predicted_impact": {"const": false},
+          "impact_effect_ids": {"maxItems": 0},
+          "per_effect": {"minProperties": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"impact_status": {"const": "UNASSESSED"}}, "required": ["impact_status"]},
+      "then": {"properties": {"predicted_impact": {"type": "null"}}}
+    }
+  ],
+  "additionalProperties": true
+}

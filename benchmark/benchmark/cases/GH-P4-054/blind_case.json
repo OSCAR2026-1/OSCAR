@@ -1,0 +1,159 @@
+{
+  "agent_task": {
+    "text": "Client B asks the deterministic Host to report the page returned by its fetch_url call; Client A runs concurrently with a separate page request."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "16a4c0ab2fa4893906f6d2d250491e37ed4b3a12b9cb35c1dd9192e861736046"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "093bacf36c59cff19ef0eef414ca1930a2a1ce8e55504830793e3f0eaa666840"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "1fc41062b88763d6abd011aa6726cb278160c2e0e7414841e6a4f0e0ce77708c"
+    }
+  },
+  "case_id": "GH-P4-054",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:04493e549fad19e18a664521a69fb4c798849423f563db236dfb9df000aec2b4",
+    "image_id": "sha256:04493e549fad19e18a664521a69fb4c798849423f563db236dfb9df000aec2b4",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "89d0a05e16773a5f2ecf4060dcff80a329fc36ebd926262852edf3f19cea632f",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {}
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-345p-7cg4-v4c7",
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-345p-7cg4-v4c7",
+    "component_name": "@modelcontextprotocol/sdk",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:npm/%40modelcontextprotocol/sdk",
+    "fixed_version": "1.26.0",
+    "patch_url": "https://github.com/@modelcontextprotocol/sdk/@modelcontextprotocol/sdk/compare/v1.10.2...v1.26.0",
+    "repository_url": "https://github.com/jae-jae/fetch-mcp",
+    "source_commit": "8754aff66e3d9207502207bf82a493f45f556bb8",
+    "vulnerable_version": "1.10.2"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "SIDE=fixed",
+        "--env",
+        "REPETITION=__VULVEIL_REPETITION__",
+        "--env",
+        "OUTPUT_ROOT=/workspace/output",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p4_054.mjs:/opt/gt/run_gh_p4_054.mjs:ro",
+        "sha256:a889b52bba96ea4a0bc52a24004b401d9994f0232b423b4acf223a27a18a47a7",
+        "node",
+        "/opt/gt/run_gh_p4_054.mjs"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "SIDE=vulnerable",
+        "--env",
+        "REPETITION=__VULVEIL_REPETITION__",
+        "--env",
+        "OUTPUT_ROOT=/workspace/output",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p4_054.mjs:/opt/gt/run_gh_p4_054.mjs:ro",
+        "sha256:04493e549fad19e18a664521a69fb4c798849423f563db236dfb9df000aec2b4",
+        "node",
+        "/opt/gt/run_gh_p4_054.mjs"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "31d2cd820c4de57447ddd74a8d4ff59393c19dd7f2159a09e7af2ba41b1e26b8",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "31d2cd820c4de57447ddd74a8d4ff59393c19dd7f2159a09e7af2ba41b1e26b8"
+  },
+  "tool": {
+    "name": "fetch_url",
+    "transport": "streamable-http"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {},
+      "name": "fetch_url"
+    }
+  ]
+}

@@ -1,0 +1,85 @@
+{
+  "case_id": "GH-P3-119-bitbucket-server-mcp-axios-no-proxy",
+  "direct_runtime_dependency": {
+    "declared_range": "^1.6.5",
+    "dependency_depth": 1,
+    "dependency_ecosystem": "npm",
+    "dependency_name": "axios",
+    "dependency_purl": "pkg:npm/axios",
+    "dependency_scope": "runtime",
+    "fixed_version": "1.15.0",
+    "lockfile": "source/package-lock.json:10-18 and node_modules/axios",
+    "lockfile_version": "1.7.9",
+    "manifest": "source/package.json:14-18; dependencies.axios",
+    "mcp_server_own_source_or_package_vulnerability": false,
+    "pair_resolution": "The immutable server source and all non-vulnerability dependencies are shared; only direct axios is installed as 1.13.6 or 1.15.0.",
+    "relation_status": "affected_exact_direct_runtime",
+    "vulnerable_version": "1.13.6"
+  },
+  "discovery": {
+    "discovered_on": "2026-09-26",
+    "discovery_url": "https://mcp.so/servers/bitbucket-server-mcp-server-kartikpatpatwingify",
+    "repository_commit": "83768c0fa18fb7fe5f46297d8309318e90546984",
+    "repository_url": "https://github.com/kartikpatpatwingify/bitbucket-server-mcp-server",
+    "server_inclusion_count_before": 0,
+    "source": "MCPZoo",
+    "source_archive_sha256": "d9800dffa0f2727260832424a68c9610b27c0c09f466a98cef5e7996e76b7199"
+  },
+  "environment": {
+    "add_hosts": [
+      "localhost.:127.0.0.1"
+    ],
+    "base_image": "sha256:43ac6c60b8f89723f746e8a92ce91abd5017e627ce1ddfe4238355d3a30b772c",
+    "cap_drop": [
+      "ALL"
+    ],
+    "mounts": [
+      "formal run output:rw:/workspace/output"
+    ],
+    "network": "none",
+    "only_side_difference": "axios==1.13.6 versus axios==1.15.0",
+    "read_only_root": true,
+    "runtime_user": "1010:1010",
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "tmpfs": [
+      "/tmp:rw,nosuid,nodev"
+    ]
+  },
+  "experiment": {
+    "agent_task": "Call the frozen get_pull_request Tool with the frozen Bitbucket identifiers and report only its returned result.",
+    "external_boundary": "Container-local HTTP target at 127.0.0.1:18119 and HTTP proxy at 127.0.0.1:18120 under Docker network none, with localhost.:127.0.0.1 mapping on both sides.",
+    "input_effect_signal_absent": true,
+    "required_repetitions": 3,
+    "same_agent_task": true,
+    "same_frozen_input": true,
+    "same_host_session_boundary": true,
+    "system_prompt": "You are a deterministic research host. Use the frozen tool call and report only the returned Tool result."
+  },
+  "mcp_path_review": {
+    "dependency_api": "BitbucketServer constructor creates axios.create({baseURL}); getPullRequest calls this.api.get(path)",
+    "fixed_blocking": "Axios 1.15.0 bypasses the proxy for the normalized localhost target, so the proxy-only marker is absent from the Tool result and exact L4.",
+    "handler_path": "src/index.ts:263-316 CallToolRequestSchema handler; src/index.ts:401-414 getPullRequest",
+    "mechanism_provenance_confirmed": true,
+    "sink_readback": "JSON.stringify(response.data) in the get_pull_request Tool result and the same marker in the role=tool content of model.next_request",
+    "tool": "get_pull_request",
+    "tool_arguments": {
+      "prId": 1,
+      "project": "P3",
+      "repository": "demo"
+    },
+    "vulnerability_derived_state": "Axios 1.13.6 sends the localhost. Bitbucket request through the configured proxy and returns a proxy-only response marker; Axios 1.15.0 normalizes localhost. and bypasses the proxy, returning the direct target marker.",
+    "vulnerability_path": "get_pull_request -> getPullRequest -> axios instance GET(baseURL + /rest/api/1.0/projects/P3/repos/demo/pull-requests/1) -> Axios proxy/NO_PROXY decision -> controlled target/proxy response -> JSON.stringify(response.data) -> MCP Tool result"
+  },
+  "schema_version": "github-direct-case-spec/v1",
+  "vulnerability": {
+    "advisory_url": "https://github.com/axios/axios/security/advisories/GHSA-3p68-rc4w-qgx5",
+    "aliases": [
+      "CVE-2025-62718"
+    ],
+    "effect_type": "SSRF_WITH_RESPONSE_OR_METADATA",
+    "id": "GHSA-3p68-rc4w-qgx5",
+    "summary": "Axios has a NO_PROXY hostname normalization bypass for trailing-dot localhost names."
+  }
+}

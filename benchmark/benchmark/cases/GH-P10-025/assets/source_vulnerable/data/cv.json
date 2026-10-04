@@ -1,0 +1,73 @@
+{
+  "personalInfo": {
+    "name": "H.T. Upetha Laksiluni",
+    "email": "upethalaksiluni@gmail.com",
+    "phone": "0707458315",
+    "location": "Colombo, Sri Lanka",
+    "linkedin": "https://www.linkedin.com/in/upetha-laksiluni-9238a0278/",
+    "github": "https://github.com/upethalaksiluni"
+  },
+  "experience": [
+    {
+      "position": "Software Engineer Intern",
+      "company": "cyberintel.online",
+      "duration": "January 2025 - Present",
+      "location": "Colombo, Sri Lanka",
+      "description": "Completed a 4-month internship gaining hands-on experience in real-world software development. Worked on live projects, improving coding, debugging, and system design skills. Assisted in backend development and database management. Collaborated with senior developers to implement efficient solutions."
+    }
+  ],
+  "education": [
+    {
+      "degree": "Software Engineering",
+      "institution": "ICBT Campus",
+      "year": "2023-2025",
+      "location": "Colombo, Sri Lanka"
+    },
+    {
+      "degree": "Ongoing Certification",
+      "institution": "C-Clarke Institute",
+      "year": "2025",
+      "location": "Colombo, Sri Lanka",
+      "description": "Completing a course at C-Clarke Institute, gaining real-world experience through 10 software projects."
+    }
+  ],
+  "projects": [
+    {
+      "name": "The Gallery Café Website",
+      "description": "Feature-rich platform integrating table reservations, pre-ordering, and dynamic shopping cart for an enhanced customer journey. Includes multi-level user login and intuitive admin dashboard.",
+      "tech": ["PHP", "MySQL", "HTML", "CSS", "JavaScript", "Bootstrap"]
+    },
+    {
+      "name": "Salon Management App & Website",
+      "description": "Streamlines appointment scheduling, customer management, and real-time bookings with responsive design and feedback features.",
+      "tech": ["PHP", "APIs", "SQL", "HTML", "CSS", "JavaScript", "Bootstrap"]
+    },
+    {
+      "name": "TechFix Service-Oriented Application",
+      "description": "Centralized ordering platform for computer shops to simplify procurement and inventory management with real-time updates.",
+      "tech": ["JavaScript", "SQL", "APIs"]
+    },
+    {
+      "name": "Dog Food App",
+      "description": "Mobile app built in Java (Android Studio) to make purchasing premium dog food easier with sleek UI and seamless navigation.",
+      "tech": ["Java", "Android Studio"]
+    }
+  ],
+  "skills": {
+    "programmingLanguages": ["C#", "Java", "C++", "Python", "Ruby", "JavaScript", "HTML", "CSS", "SQL"],
+    "frameworksAndTech": ["Laravel", "Django", "React", "Node.js", "Angular"],
+    "expertise": ["Web Development (Frontend & Backend)", "Mobile App Development", "Software Architecture", "Database Management"],
+    "additionalSkills": ["Docker", "Cloud Deployment", "AI Technologies", "UX/UI Design", "Agile/Scrum Methodologies", "Automated Deployment", "Contributing to Open Source Projects"]
+  },
+  "certifications": [
+    "Oracle Module Beginners",
+    "Creating a Good SQL Database with Level 3",
+    "Certificate in Front-End Language: Node.js for Beginners"
+  ],
+  "activities": [
+    "Participated in national programming workshops at ICBT Campus",
+    "Developed skills in collaborative project management and innovative problem-solving",
+    "Member of Rotaract Club of ICBT"
+  ],
+  "careerObjective": "A dedicated software engineer specializing in mobile, web, and game development, striving to maintain excellence in programming with a proven track record of delivering innovative solutions. Passionate about creating efficient web applications and building software solutions that solve real-world problems and positively impact communities."
+}

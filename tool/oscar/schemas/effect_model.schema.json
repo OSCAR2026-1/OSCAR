@@ -1,0 +1,212 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "vulveil-effect-model/v3",
+  "type": "object",
+  "required": ["schema_version", "status", "vulnerability_identity", "anchor_candidates", "repair_predicate", "effects", "effect_relations", "counterfactual_checks", "fixed_side_blocked", "modeling_reasons"],
+  "properties": {
+    "schema_version": {"const": "vulveil-effect-model/v3"},
+    "status": {"enum": ["GENERATED", "UNASSESSED", "INVALID"]},
+    "vulnerability_identity": {"type": "object"},
+    "vulnerability_category": {"type": "string", "minLength": 1},
+    "component_origin": {"enum": ["MCP_SERVER_SELF", "DIRECT_RUNTIME_DEPENDENCY", "MCP_FRAMEWORK"]},
+    "vulnerability_component": {
+      "type": "object",
+      "properties": {
+        "origin": {"enum": ["MCP_SERVER_SELF", "DIRECT_RUNTIME_DEPENDENCY", "MCP_FRAMEWORK"]},
+        "name": {"type": "string"},
+        "purl": {"type": "string", "pattern": "^pkg:"},
+        "repository": {"type": "string"},
+        "vulnerable_version": {"type": "string"},
+        "fixed_version": {"type": "string"},
+        "source_evidence": {"type": ["array", "string", "object"]},
+        "patch_evidence": {"type": ["array", "string", "object"]},
+        "advisory_evidence": {"type": "object", "properties": {"source": {"type": "object", "properties": {"record": {"type": "object", "required": ["id", "component", "vulnerable", "fixed", "affected"]}}}}}
+      }
+    },
+    "anchor_candidates": {"type": "array", "items": {"type": "object"}},
+    "repair_predicate": {
+      "type": "object",
+      "properties": {
+        "schema_version": {"const": "vulveil-repair-predicate/v2"},
+        "kind": {"const": "patch-scoped-repair-predicate"},
+        "anchor_ids": {"type": "array", "items": {"type": "string"}},
+        "patch_refs": {"type": "array", "items": {"type": "string"}},
+        "conditions_added_or_changed": {"type": "array"},
+        "conditions": {"type": "array", "items": {"type": "object"}},
+        "checkers": {"type": "array", "items": {"type": "object"}},
+        "path_constraints": {"type": "array", "items": {"type": "object"}},
+        "blocking_obligations": {"type": "array", "items": {"type": "object"}},
+        "classification_status": {"enum": ["SUPPORTED", "PARTIAL", "UNRESOLVED"]},
+        "dynamic_checks": {"type": "object"},
+        "fixed_side_validation": {"type": "object"},
+        "fixed_side_blocked": {"type": ["boolean", "null"]}
+      },
+      "additionalProperties": true
+    },
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["effect_id", "effect_kind", "effect_role", "classification_status", "provenance_status", "instance_key", "origin", "object", "condition", "carrier", "effect_realization", "propagation", "provenance", "sink_candidates", "evidence_refs", "confidence"],
+        "properties": {
+          "effect_id": {"type": "string", "minLength": 1},
+          "effect_kind": {"enum": ["CONTROL_EFFECT", "RESOURCE_EFFECT", "VALUE_EFFECT"]},
+          "effect_role": {"enum": ["INTERMEDIATE", "TERMINAL", "BOTH"]},
+          "classification_status": {"enum": ["SUPPORTED", "PARTIAL", "UNRESOLVED", "UNASSESSED"]},
+          "provenance_status": {"enum": ["SUPPORTED", "PARTIAL", "UNRESOLVED", "UNASSESSED"]},
+          "instance_key": {"type": "string", "minLength": 1},
+          "origin": {
+            "type": "object",
+            "properties": {
+              "functions": {"type": "array", "items": {"type": "string"}},
+              "apis": {"type": "array", "items": {"type": "string"}},
+              "source_refs": {"type": "array", "items": {"type": "string"}},
+              "anchor_refs": {"type": "array", "items": {"type": "string"}},
+              "tool_call_identity": {"type": ["object", "null"]},
+              "runtime_event": {"type": ["object", "null"]}
+            }
+          },
+          "object": {
+            "type": "object",
+            "properties": {
+              "field_paths": {"type": "array", "items": {"type": "string"}},
+              "resource_identity": {"type": ["string", "null"]},
+              "operation": {"type": ["string", "null"]},
+              "resource_events": {"type": "array", "items": {"type": "object"}},
+              "before_state": {},
+              "after_state": {},
+              "readback_paths": {"type": "array", "items": {"type": "string"}},
+              "instance_signature": {"type": "string"}
+            }
+          },
+          "condition": {
+            "type": "object",
+            "properties": {
+              "patch_derived": {"type": "boolean"},
+              "production_evidence": {"type": "array", "items": {"type": "string"}},
+              "production_predicate": {
+                "type": "object",
+                "required": ["anchor_reached", "effect_specific_witness"],
+                "properties": {
+                  "anchor_reached": {"type": "boolean"},
+                  "effect_specific_witness": {"type": "string"}
+                }
+              }
+            }
+          },
+          "carrier": {
+            "type": "object",
+            "required": ["kind", "field_mapping", "l4_eligible", "field_names", "paths", "levels", "vulnerable_value_digests", "fixed_value_digests"],
+            "properties": {
+              "kind": {"enum": ["returned_value", "structured_content", "resource_reference", "error_or_status", "metadata", "side_effect_only", "control_signal"]},
+              "path": {"type": ["string", "null"]},
+              "projection": {"type": "string"},
+              "field_mapping": {"type": ["string", "object", "array"]},
+              "l4_eligible": {"type": "boolean"},
+              "levels": {"type": "array", "items": {"type": "string"}},
+              "field_names": {"type": "array", "items": {"type": "string"}},
+              "paths": {"type": "array", "items": {"type": "string"}},
+              "tool_names": {"type": "array", "items": {"type": "string"}},
+              "provenance_fields": {"type": "array", "items": {"type": "string"}},
+              "provenance_paths": {"type": "array", "items": {"type": "string"}},
+              "value_predicate": {"type": ["string", "null"]},
+              "vulnerable_value_digests": {"type": "object"},
+              "fixed_value_digests": {"type": "object"},
+              "carrier_kind": {"enum": ["CONTROL_STATE", "PROGRAM_VALUE", "RESOURCE_EVENT"]},
+              "readback_paths": {"type": "array", "items": {"type": "string"}},
+              "transformations": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["input", "output", "rule", "evidence_refs", "input_fingerprints", "output_fingerprints"],
+                  "properties": {
+                    "input": {"type": ["string", "array"]},
+                    "output": {"type": ["string", "array"]},
+                    "rule": {"type": "string", "minLength": 1},
+                    "evidence_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+                    "input_fingerprints": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1},
+                    "output_fingerprints": {"type": "array", "items": {"type": "string", "minLength": 1}, "minItems": 1}
+                  }
+                }
+              }
+            }
+          },
+          "effect_realization": {
+            "type": "object",
+            "required": ["status", "witness_refs", "sink_refs"],
+            "properties": {
+              "status": {"enum": ["REALIZED", "NOT_REALIZED", "UNASSESSED"]},
+              "witness_refs": {"type": "array", "items": {"type": "string"}},
+              "sink_refs": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "propagation": {
+            "type": "object",
+            "required": ["tool_result", "host", "session", "agent_observation", "max_reached_level"],
+            "properties": {
+              "tool_result": {"enum": ["REACHED", "DROPPED", "TRANSFORMED", "NOT_REACHED", "NOT_ASSESSED"]},
+              "host": {"enum": ["REACHED", "DROPPED", "TRANSFORMED", "NOT_REACHED", "NOT_ASSESSED"]},
+              "session": {"enum": ["REACHED", "DROPPED", "TRANSFORMED", "NOT_REACHED", "NOT_ASSESSED"]},
+              "agent_observation": {"enum": ["REACHED", "DROPPED", "TRANSFORMED", "NOT_REACHED", "NOT_ASSESSED"]},
+              "max_reached_level": {"enum": ["L0", "L1", "L2", "L3", "L4", "UNASSESSED"]}
+            }
+          },
+          "provenance": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["from", "to", "edge_type", "slice_direction", "description", "evidence_refs"],
+              "properties": {
+                "from": {"type": "string", "minLength": 1},
+                "to": {"type": "string", "minLength": 1},
+                "edge_type": {"enum": ["call", "data", "control", "serialize", "state", "observe"]},
+                "slice_direction": {"type": "array", "items": {"enum": ["forward", "backward"]}, "minItems": 1},
+                "description": {"type": "string", "minLength": 1},
+                "evidence_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+              }
+            }
+          },
+          "sink_candidates": {"type": "array", "items": {"type": "object"}},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "confidence": {"type": "number", "minimum": 0, "maximum": 1}
+        }
+      }
+    },
+    "effect_relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to", "relation", "evidence_refs", "provenance_status"],
+        "properties": {
+          "from": {"type": "string", "minLength": 1},
+          "to": {"type": "string", "minLength": 1},
+          "relation": {"enum": ["ENABLES", "CAUSES", "DERIVES", "DERIVES_VALUE", "BLOCKS", "PROPAGATES_TO", "ALIGNS_WITH", "PRODUCES"]},
+          "evidence_refs": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "provenance_status": {"enum": ["SUPPORTED", "PARTIAL", "UNRESOLVED", "UNASSESSED"]},
+          "reason": {"type": "string"}
+        }
+      }
+    },
+    "counterfactual_checks": {"type": "array", "items": {"type": "object"}},
+    "fixed_side_blocked": {"type": ["boolean", "null"]},
+    "modeling_reasons": {"type": "array", "items": {"type": "string"}}
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {"const": "GENERATED"}
+        }
+      },
+      "then": {
+        "properties": {
+          "repair_predicate": {
+            "required": ["schema_version", "kind", "anchor_ids", "patch_refs", "conditions", "checkers", "path_constraints", "blocking_obligations", "classification_status", "dynamic_checks", "fixed_side_validation", "fixed_side_blocked", "conditions_added_or_changed"]
+          }
+        }
+      }
+    }
+  ]
+}

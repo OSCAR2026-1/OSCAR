@@ -1,0 +1,251 @@
+{
+  "agent_task": {
+    "text": "Call the frozen call_rest_api Tool and report only its returned result."
+  },
+  "analysis_patch": {
+    "path": "assets/analysis.patch",
+    "sha256": "0582fe044c0c59c88e6f7db48aad3d70da9c365d27f66460adb427f97f8ec5d2"
+  },
+  "analysis_source": {
+    "fixed": {
+      "root": "assets/analysis_fixed",
+      "tree_sha256": "96881dc2cd36f671c320795f997ef56361a31c276cd4d2d853ddfb728744d63a"
+    },
+    "vulnerable": {
+      "root": "assets/analysis_vulnerable",
+      "tree_sha256": "9e917a01c56318de521cccd1b4eea1c0adcfeca41f1b566649977e5139ce0322"
+    }
+  },
+  "case_id": "GH-P3-009-rest-mcp-requests-netrc",
+  "environment": {
+    "cap_drop": [
+      "ALL"
+    ],
+    "image": "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+    "image_id": "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+    "network": "none",
+    "read_only": true,
+    "security_options": [
+      "no-new-privileges:true"
+    ],
+    "user": "1010:1010"
+  },
+  "external_boundary": {
+    "configuration_sha256": "51b4293ae06f52fdff2ba9f1e1000b693c26120c978c1524bc0401df5a3a92f9",
+    "kind": "container-local-controlled-boundary"
+  },
+  "frozen_input": {
+    "arguments": {
+      "data": null,
+      "headers": null,
+      "method": "GET",
+      "params": null,
+      "timeout": 5,
+      "url": "http://trusted.internal:80@127.0.0.1:18080/agent-readback"
+    }
+  },
+  "host_profile": {
+    "opaque_id": "vhp-73dbf71290de473d",
+    "profile_sha256": "73dbf71290de473dc0a0062c894a0f5bda16506bfc653b46aa526c3e4b20d196"
+  },
+  "public_vulnerability": {
+    "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+    "advisory_semantics": {
+      "advisory_id": "GHSA-9hjg-9r4m-mvj7",
+      "claims": [
+        {
+          "claim_id": "netrc-credential-third-party-transmission",
+          "effect_kind": "RESOURCE_EFFECT",
+          "effect_role": "TERMINAL",
+          "exact_quote": "leak .netrc credentials to third parties",
+          "object_kind": "http-credential-transmission",
+          "operation": "send",
+          "runtime_oracle": {
+            "effect_event_operation": "send",
+            "kind": "http-credential-provenance/v1"
+          }
+        }
+      ],
+      "review_method": "human-reviewed-public-advisory/v1",
+      "schema_version": "public-advisory-effect-semantics/v1",
+      "source_excerpt": "Requests vulnerable to .netrc credentials leak via malicious URLs\nDue to a URL parsing issue, Requests releases prior to 2.32.4 may leak .netrc credentials to third parties for specific maliciously-crafted URLs.",
+      "source_excerpt_sha256": "07872f4ddbe2d232c47ca3204be9cc177efa6e7d70f8c3656da18f3ef516fbee",
+      "source_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7"
+    },
+    "advisory_url": "https://osv.dev/vulnerability/GHSA-9hjg-9r4m-mvj7",
+    "component_name": "requests",
+    "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+    "component_purl": "pkg:pypi/requests",
+    "fixed_version": "2.32.4",
+    "patch_url": "https://github.com/requests/requests/compare/v2.32.3...v2.32.4",
+    "repository_url": "https://github.com/lumenghe/rest-mcp",
+    "source_commit": "b0ca0b5afdae90fe4d8f01982b426685acdc24ac",
+    "vulnerable_version": "2.32.3"
+  },
+  "runner": {
+    "fixed": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P3-009-rest-mcp-requests-netrc.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P3-009-rest-mcp-requests-netrc/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p3_009.py:/opt/gt/run_gh_p3_009.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/source_fixed:/workspace/source:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/analysis_fixed:/workspace/side-deps/requests:ro",
+        "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p3_009.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "fixed",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    },
+    "repetitions": 3,
+    "timeout_seconds": 120,
+    "vulnerable": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--init",
+        "-i",
+        "--network",
+        "none",
+        "--read-only",
+        "--user",
+        "1010:1010",
+        "--cap-drop",
+        "ALL",
+        "--security-opt",
+        "no-new-privileges:true",
+        "--tmpfs",
+        "/tmp:rw,exec,nosuid,nodev",
+        "--entrypoint=",
+        "--env",
+        "RQ1_HOST_PROFILE_CONFIG=/opt/gt/rq1_host_profile.json",
+        "--env",
+        "SHARED_HOST_PROFILE=/opt/gt/rq1_host_profile.json",
+        "-v",
+        "__VULVEIL_OUTPUT_DIR__:/workspace/output:rw",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/profiles/GH-P3-009-rest-mcp-requests-netrc.json:/opt/gt/rq1_host_profile.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/cases/GH-P3-009-rest-mcp-requests-netrc/case_spec.json:/opt/gt/case_spec.json:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_gh_p3_009.py:/opt/gt/run_gh_p3_009.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runners/run_public_case_wrapper.py:/opt/gt/public_case_wrapper.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/host_core.py:/opt/gt/host_core.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner.py:/opt/gt/shared_host_runner.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/shared_host_runner_base.py:/opt/gt/shared_host_runner_base.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/projection.py:/opt/gt/projection.py:ro",
+        "-v",
+        "__OSCAR_CASESET_ROOT__/runtime/mcp_http_transport.py:/opt/gt/mcp_http_transport.py:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/source_vulnerable:/workspace/source:ro",
+        "-v",
+        "__VULVEIL_CASE_DIR__/assets/analysis_vulnerable:/workspace/side-deps/requests:ro",
+        "sha256:77f439e07c7414eadc660c529b462edb18bf64856ab9f7c0bedba410c81019b4",
+        "python3",
+        "/opt/gt/public_case_wrapper.py",
+        "--original",
+        "/opt/gt/run_gh_p3_009.py",
+        "--spec",
+        "/opt/gt/case_spec.json",
+        "--output",
+        "/workspace/output",
+        "--side",
+        "vulnerable",
+        "--repetition",
+        "__VULVEIL_REPETITION__"
+      ],
+      "cwd": "/workspace",
+      "environment": {
+        "LANG": "C.UTF-8",
+        "LC_ALL": "C.UTF-8",
+        "TZ": "UTC"
+      },
+      "evidence_output": "/output/evidence.jsonl"
+    }
+  },
+  "schema_version": "vulveil-blind-case/v3",
+  "source": {
+    "fixed_root": "assets/source_fixed",
+    "fixed_tree_sha256": "e3bac00ead155b2bb0b74bdf8316d31e58ab78ca1eda20ed686c1e9b04df7087",
+    "vulnerable_root": "assets/source_vulnerable",
+    "vulnerable_tree_sha256": "e3bac00ead155b2bb0b74bdf8316d31e58ab78ca1eda20ed686c1e9b04df7087"
+  },
+  "tool": {
+    "name": "call_rest_api",
+    "transport": "stdio"
+  },
+  "tool_sequence": [
+    {
+      "arguments": {
+        "data": null,
+        "headers": null,
+        "method": "GET",
+        "params": null,
+        "timeout": 5,
+        "url": "http://trusted.internal:80@127.0.0.1:18080/agent-readback"
+      },
+      "name": "call_rest_api"
+    }
+  ]
+}

@@ -1,0 +1,1564 @@
+{
+  "schema_version": "vulveil-effect-model/v3",
+  "status": "GENERATED",
+  "vulnerability_identity": {
+    "advisory": "CVE-CLI-FIXTURE-0001",
+    "package": "fixture-package",
+    "vulnerable_version": "1.0.0",
+    "fixed_version": "1.0.1"
+  },
+  "component_origin": "DIRECT_RUNTIME_DEPENDENCY",
+  "anchor_candidates": [
+    {
+      "anchor_id": "anchor-1",
+      "kind": "call",
+      "symbol": "ValueError",
+      "function": "probe",
+      "side": "fixed",
+      "source_ref": "probe.py:5",
+      "source_path": "probe.py",
+      "source_line": 5,
+      "vulnerability_category": null,
+      "patch_change": "added",
+      "mapping": "patch-hunk-and-structured-node",
+      "confidence": 0.9,
+      "evidence_refs": [
+        "probe.py:5",
+        "patch:probe.py"
+      ]
+    },
+    {
+      "anchor_id": "anchor-2",
+      "kind": "call",
+      "symbol": "fixture_package.execute",
+      "function": "probe",
+      "side": "fixed",
+      "source_ref": "probe.py:6",
+      "source_path": "probe.py",
+      "source_line": 6,
+      "vulnerability_category": null,
+      "patch_change": "added",
+      "mapping": "patch-hunk-and-structured-node",
+      "confidence": 0.9,
+      "evidence_refs": [
+        "probe.py:6",
+        "patch:probe.py"
+      ]
+    },
+    {
+      "anchor_id": "anchor-3",
+      "kind": "call",
+      "symbol": "isinstance",
+      "function": "probe",
+      "side": "fixed",
+      "source_ref": "probe.py:4",
+      "source_path": "probe.py",
+      "source_line": 4,
+      "vulnerability_category": null,
+      "patch_change": "added",
+      "mapping": "patch-hunk-and-structured-node",
+      "confidence": 0.9,
+      "evidence_refs": [
+        "probe.py:4",
+        "patch:probe.py"
+      ]
+    },
+    {
+      "anchor_id": "anchor-4",
+      "kind": "guard",
+      "symbol": "not isinstance(value, str)",
+      "function": "probe",
+      "side": "fixed",
+      "source_ref": "probe.py:4",
+      "source_path": "probe.py",
+      "source_line": 4,
+      "vulnerability_category": null,
+      "patch_change": "added",
+      "mapping": "patch-hunk-and-structured-node",
+      "confidence": 0.9,
+      "evidence_refs": [
+        "probe.py:4",
+        "patch:probe.py"
+      ]
+    },
+    {
+      "anchor_id": "anchor-5",
+      "kind": "return",
+      "symbol": "",
+      "function": "probe",
+      "side": "fixed",
+      "source_ref": "probe.py:6",
+      "source_path": "probe.py",
+      "source_line": 6,
+      "vulnerability_category": null,
+      "patch_change": "added",
+      "mapping": "patch-hunk-and-structured-node",
+      "confidence": 0.9,
+      "evidence_refs": [
+        "probe.py:6",
+        "patch:probe.py"
+      ]
+    }
+  ],
+  "localization_digest": "d7c837858c597f07fbffb9b22523938f136dff91304c546269696415d64bef04",
+  "repair_predicate": {
+    "schema_version": "vulveil-repair-predicate/v2",
+    "kind": "patch-scoped-repair-predicate",
+    "anchor_ids": [
+      "anchor-1",
+      "anchor-2",
+      "anchor-3",
+      "anchor-4",
+      "anchor-5"
+    ],
+    "patch_refs": [
+      "patch:probe.py",
+      "patch:probe.py#hunk-1:+4",
+      "patch:probe.py#hunk-1:+5",
+      "patch:probe.py#hunk-1:+6"
+    ],
+    "conditions": [
+      {
+        "condition_id": "condition-1",
+        "kind": "changed_exception_behavior",
+        "side": "fixed",
+        "function": "probe",
+        "source_ref": "probe.py:5",
+        "anchor_id": "anchor-1",
+        "expression": "ValueError",
+        "normalized_form": "ValueError",
+        "patch_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+5"
+        ],
+        "evidence_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+5",
+          "probe.py:5"
+        ],
+        "classification_status": "SUPPORTED"
+      },
+      {
+        "condition_id": "condition-2",
+        "kind": "changed_argument",
+        "side": "fixed",
+        "function": "probe",
+        "source_ref": "probe.py:6",
+        "anchor_id": "anchor-2",
+        "expression": "fixture_package.execute",
+        "normalized_form": "fixture_package.execute",
+        "patch_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+6"
+        ],
+        "evidence_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+6",
+          "probe.py:6"
+        ],
+        "classification_status": "SUPPORTED"
+      },
+      {
+        "condition_id": "condition-3",
+        "kind": "added_type_check",
+        "side": "fixed",
+        "function": "probe",
+        "source_ref": "probe.py:4",
+        "anchor_id": "anchor-3",
+        "expression": "isinstance",
+        "normalized_form": "isinstance",
+        "patch_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+4"
+        ],
+        "evidence_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+4",
+          "probe.py:4"
+        ],
+        "classification_status": "SUPPORTED",
+        "checker_id": "checker-1"
+      },
+      {
+        "condition_id": "condition-4",
+        "kind": "added_type_check",
+        "side": "fixed",
+        "function": "probe",
+        "source_ref": "probe.py:4",
+        "anchor_id": "anchor-3",
+        "expression": "not isinstance(value, str)",
+        "normalized_form": "not isinstance(value, str)",
+        "patch_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+4"
+        ],
+        "evidence_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+4",
+          "probe.py:4"
+        ],
+        "classification_status": "SUPPORTED",
+        "checker_id": "checker-1"
+      },
+      {
+        "condition_id": "condition-5",
+        "kind": "changed_return",
+        "side": "fixed",
+        "function": "probe",
+        "source_ref": "probe.py:6",
+        "anchor_id": "anchor-2",
+        "expression": "fixture_package.execute(['echo', value], shell=False)",
+        "normalized_form": "fixture_package.execute(['echo', value], shell=False)",
+        "patch_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+6"
+        ],
+        "evidence_refs": [
+          "patch:probe.py",
+          "patch:probe.py#hunk-1:+6",
+          "probe.py:6"
+        ],
+        "classification_status": "SUPPORTED"
+      }
+    ],
+    "checkers": [
+      {
+        "checker_id": "checker-1",
+        "checker_kind": "type_check",
+        "source_ref": "probe.py:4",
+        "function": "probe",
+        "expression": "not isinstance(value, str)",
+        "input_symbols": [
+          "value"
+        ],
+        "protected_resource": null,
+        "blocking_action": "reject",
+        "confidence": 0.94,
+        "evidence_refs": [
+          "probe.py:4"
+        ],
+        "side": "fixed"
+      }
+    ],
+    "path_constraints": [],
+    "blocking_obligations": [
+      {
+        "obligation": "fixed checker checker-1 must block the vulnerable effect before the localized sink",
+        "required": true,
+        "evidence_refs": [
+          "probe.py:4"
+        ]
+      }
+    ],
+    "classification_status": "SUPPORTED",
+    "dynamic_checks": {
+      "return_events_changed": [
+        "content#260614e38831f59f",
+        "content#3f4075ec78da34c1",
+        "return#260614e38831f59f",
+        "return#3f4075ec78da34c1"
+      ]
+    },
+    "fixed_side_validation": {
+      "same_patch_scope": true,
+      "vulnerable_carrier_paths": [
+        "tool_result.derived_value"
+      ],
+      "fixed_has_vulnerable_value": false,
+      "vulnerable_trace_valid": true,
+      "fixed_trace_valid": true,
+      "blocking_evidence": [
+        "vulnerable_only_paths",
+        "return_events_changed"
+      ],
+      "paired_trace_validation": {
+        "status": "PAIRED_EFFECT_DIFFERENCE_ONLY",
+        "validation_conclusion": "PAIRED_EFFECT_DIFFERENCE_ONLY",
+        "global_paired_effect_difference": true,
+        "checker_attribution": "UNSCOPED",
+        "valid_paired_trace": true,
+        "checkers": [
+          {
+            "checker_id": "checker-1",
+            "trigger_case": "not_exercised",
+            "safe_case": "not_assessed",
+            "vulnerable_effect_observed": false,
+            "fixed_effect_observed": false,
+            "checker_has_scoped_evidence": false,
+            "paired_effect_difference_observed": false,
+            "validation_conclusion": "UNASSESSED",
+            "blocking_supported": false,
+            "checker_execution_attested": false,
+            "attestation_status": "UNASSESSED",
+            "execution_identity_status": "MISSING_OR_MISMATCHED",
+            "matched_execution_pairs": 0,
+            "matched_blocking_pairs": 0,
+            "blocking_boundary": "unresolved",
+            "evidence_refs": [
+              "probe.py:4"
+            ]
+          }
+        ],
+        "evidence_refs": [
+          "probe.py:4"
+        ]
+      },
+      "checker_validation": [
+        {
+          "checker_id": "checker-1",
+          "trigger_case": "not_exercised",
+          "safe_case": "not_assessed",
+          "vulnerable_effect_observed": false,
+          "fixed_effect_observed": false,
+          "checker_has_scoped_evidence": false,
+          "paired_effect_difference_observed": false,
+          "validation_conclusion": "UNASSESSED",
+          "blocking_supported": false,
+          "checker_execution_attested": false,
+          "attestation_status": "UNASSESSED",
+          "execution_identity_status": "MISSING_OR_MISMATCHED",
+          "matched_execution_pairs": 0,
+          "matched_blocking_pairs": 0,
+          "blocking_boundary": "unresolved",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        }
+      ],
+      "runtime_validation_status": "PAIRED_EFFECT_DIFFERENCE_ONLY"
+    },
+    "fixed_side_blocked": true,
+    "conditions_added_or_changed": [
+      "ValueError",
+      "fixture_package.execute",
+      "isinstance",
+      "not isinstance(value, str)",
+      "fixture_package.execute(['echo', value], shell=False)"
+    ]
+  },
+  "effects": [
+    {
+      "effect_id": "effect-control-cf708e03ed94-1",
+      "effect_kind": "CONTROL_EFFECT",
+      "instance_key": "5e094bbf33c35e28",
+      "origin": {
+        "functions": [
+          "probe"
+        ],
+        "apis": [],
+        "source_refs": [
+          "probe.py:4"
+        ],
+        "runtime_call_differences": [],
+        "anchor_refs": [
+          "anchor-1",
+          "anchor-2",
+          "anchor-3",
+          "anchor-4",
+          "anchor-5"
+        ],
+        "source_locations": [],
+        "tool_call_identity": null,
+        "runtime_event": {
+          "function": "fixture_package.execute",
+          "location": "probe.py:5",
+          "tool_call_id": "fixture-call-1",
+          "return": {
+            "tool_result": {
+              "derived_value": "fixture-derived"
+            }
+          }
+        }
+      },
+      "object": {
+        "kind": "execution behavior",
+        "field_paths": [
+          "tool_result.derived_value"
+        ],
+        "semantic_fields": [],
+        "resource_events": [],
+        "resource_identity": null,
+        "operation": null,
+        "before_state": null,
+        "after_state": null,
+        "readback_paths": [],
+        "instance_signature": "5e094bbf33c35e28"
+      },
+      "condition": {
+        "input_fields": [
+          "value"
+        ],
+        "predicates": [
+          "not isinstance(value, str)"
+        ],
+        "patch_derived": true,
+        "dynamic_difference": {
+          "changed_fields": [
+            "derived_value",
+            "status"
+          ],
+          "changed_paths": [
+            "tool_result.derived_value",
+            "tool_result.status"
+          ],
+          "return_events_changed": [
+            "content#260614e38831f59f",
+            "content#3f4075ec78da34c1",
+            "return#260614e38831f59f",
+            "return#3f4075ec78da34c1"
+          ]
+        },
+        "production_evidence": [
+          "probe.py:4",
+          "patch:probe.py",
+          "trace:vulnerable:L2",
+          "trace:fixed:L2",
+          "trace:vulnerable:L4",
+          "trace:fixed:L4"
+        ],
+        "production_predicate": {
+          "anchor_reached": true,
+          "effect_specific_witness": "differential_return_or_control_event"
+        }
+      },
+      "carrier": {
+        "levels": [
+          "L0",
+          "L1",
+          "L2",
+          "L3",
+          "L4"
+        ],
+        "field_names": [
+          "derived_value"
+        ],
+        "paths": [
+          "tool_result.derived_value"
+        ],
+        "tool_names": [
+          "probe"
+        ],
+        "provenance_fields": [
+          "derived_value"
+        ],
+        "provenance_paths": [
+          "tool_result.derived_value"
+        ],
+        "value_predicate": "same-run-tool-result-to-l4-digest",
+        "vulnerable_value_digests": {
+          "tool_result.derived_value": [
+            "79e4471b427062ea"
+          ]
+        },
+        "fixed_value_digests": {},
+        "carrier_kind": "CONTROL_STATE",
+        "readback_paths": [],
+        "transformations": [
+          {
+            "input": [
+              "CONTROL_STATE"
+            ],
+            "output": [
+              "tool_result.derived_value"
+            ],
+            "rule": "control-event-to-return-status-carrier",
+            "evidence_refs": [
+              "probe.py:4",
+              "patch:probe.py",
+              "trace:vulnerable:L2",
+              "trace:fixed:L2",
+              "trace:vulnerable:L4",
+              "trace:fixed:L4"
+            ],
+            "input_fingerprints": [
+              "14c73527d80f24607a12dedad1a7bac5c1ebc6b2877816b3f956ac58d98aed73"
+            ],
+            "output_fingerprints": [
+              "79e4471b427062ea"
+            ]
+          }
+        ],
+        "kind": "returned_value",
+        "path": "tool_result.derived_value",
+        "projection": "tool_result_to_host_to_session_to_model",
+        "field_mapping": "tool_result.derived_value -> L0 -> L1 -> L2 -> L3 -> L4",
+        "l4_eligible": true,
+        "resource_operation": null
+      },
+      "provenance": [
+        {
+          "from": "source:fixed:probe.py:5",
+          "to": "api:ValueError",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:5"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:6",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:6"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "api:isinstance",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "tool-input:value",
+          "to": "source:fixed:probe.py:4",
+          "edge_type": "control",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Tool input field is referenced by the parsed source node",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:4",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:2",
+          "to": "api:mcp.tool",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:2"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "source:vulnerable:probe.py:4",
+          "edge_type": "control",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Repair guard controls the corresponding origin call in the same function",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "source:vulnerable:probe.py:2",
+          "edge_type": "control",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Repair guard controls the corresponding origin call in the same function",
+          "evidence_refs": [
+            "probe.py:2",
+            "probe.py:4"
+          ]
+        }
+      ],
+      "sink_candidates": [
+        {
+          "layer": "MCP_TOOL_RESULT",
+          "tool": "probe",
+          "field_paths": [
+            "tool_result.derived_value"
+          ]
+        },
+        {
+          "layer": "L4_MODEL_VISIBLE_OBSERVATION",
+          "tool": "probe",
+          "field_paths": [
+            "tool_result.derived_value"
+          ]
+        }
+      ],
+      "evidence_refs": [
+        "probe.py:4",
+        "patch:probe.py",
+        "trace:vulnerable:L2",
+        "trace:fixed:L2",
+        "trace:vulnerable:L4",
+        "trace:fixed:L4"
+      ],
+      "confidence": 0.92,
+      "effect_role": "INTERMEDIATE",
+      "classification_status": "PARTIAL",
+      "provenance_status": "PARTIAL",
+      "effect_realization": {
+        "status": "NOT_REALIZED",
+        "witness_refs": [],
+        "sink_refs": []
+      },
+      "propagation": {
+        "tool_result": "REACHED",
+        "host": "REACHED",
+        "session": "REACHED",
+        "agent_observation": "REACHED",
+        "max_reached_level": "L4"
+      }
+    },
+    {
+      "effect_id": "effect-control-cf708e03ed94-2",
+      "effect_kind": "CONTROL_EFFECT",
+      "instance_key": "5e094bbf33c35e28",
+      "origin": {
+        "functions": [
+          "probe"
+        ],
+        "apis": [],
+        "source_refs": [
+          "probe.py:4"
+        ],
+        "runtime_call_differences": [],
+        "anchor_refs": [
+          "anchor-1",
+          "anchor-2",
+          "anchor-3",
+          "anchor-4",
+          "anchor-5"
+        ],
+        "source_locations": [],
+        "tool_call_identity": null,
+        "runtime_event": {
+          "function": "fixture_package.execute",
+          "location": "probe.py:5",
+          "tool_call_id": "fixture-call-1",
+          "return": {
+            "tool_result": {
+              "derived_value": "fixture-derived"
+            }
+          }
+        }
+      },
+      "object": {
+        "kind": "execution behavior",
+        "field_paths": [
+          "tool_result.derived_value"
+        ],
+        "semantic_fields": [],
+        "resource_events": [],
+        "resource_identity": null,
+        "operation": null,
+        "before_state": null,
+        "after_state": null,
+        "readback_paths": [],
+        "instance_signature": "5e094bbf33c35e28"
+      },
+      "condition": {
+        "input_fields": [
+          "value"
+        ],
+        "predicates": [
+          "not isinstance(value, str)"
+        ],
+        "patch_derived": true,
+        "dynamic_difference": {
+          "changed_fields": [
+            "derived_value",
+            "status"
+          ],
+          "changed_paths": [
+            "tool_result.derived_value",
+            "tool_result.status"
+          ],
+          "return_events_changed": [
+            "content#260614e38831f59f",
+            "content#3f4075ec78da34c1",
+            "return#260614e38831f59f",
+            "return#3f4075ec78da34c1"
+          ]
+        },
+        "production_evidence": [
+          "probe.py:4",
+          "patch:probe.py",
+          "trace:vulnerable:L2",
+          "trace:fixed:L2",
+          "trace:vulnerable:L4",
+          "trace:fixed:L4"
+        ],
+        "production_predicate": {
+          "anchor_reached": true,
+          "effect_specific_witness": "differential_return_or_control_event"
+        }
+      },
+      "carrier": {
+        "levels": [
+          "L0",
+          "L1",
+          "L2",
+          "L3",
+          "L4"
+        ],
+        "field_names": [
+          "derived_value"
+        ],
+        "paths": [
+          "tool_result.derived_value"
+        ],
+        "tool_names": [
+          "probe"
+        ],
+        "provenance_fields": [
+          "derived_value"
+        ],
+        "provenance_paths": [
+          "tool_result.derived_value"
+        ],
+        "value_predicate": "same-run-tool-result-to-l4-digest",
+        "vulnerable_value_digests": {
+          "tool_result.derived_value": [
+            "79e4471b427062ea"
+          ]
+        },
+        "fixed_value_digests": {},
+        "carrier_kind": "CONTROL_STATE",
+        "readback_paths": [],
+        "transformations": [
+          {
+            "input": [
+              "CONTROL_STATE"
+            ],
+            "output": [
+              "tool_result.derived_value"
+            ],
+            "rule": "control-event-to-return-status-carrier",
+            "evidence_refs": [
+              "probe.py:4",
+              "patch:probe.py",
+              "trace:vulnerable:L2",
+              "trace:fixed:L2",
+              "trace:vulnerable:L4",
+              "trace:fixed:L4"
+            ],
+            "input_fingerprints": [
+              "14c73527d80f24607a12dedad1a7bac5c1ebc6b2877816b3f956ac58d98aed73"
+            ],
+            "output_fingerprints": [
+              "79e4471b427062ea"
+            ]
+          }
+        ],
+        "kind": "returned_value",
+        "path": "tool_result.derived_value",
+        "projection": "tool_result_to_host_to_session_to_model",
+        "field_mapping": "tool_result.derived_value -> L0 -> L1 -> L2 -> L3 -> L4",
+        "l4_eligible": true,
+        "resource_operation": null
+      },
+      "provenance": [
+        {
+          "from": "source:fixed:probe.py:5",
+          "to": "api:ValueError",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:5"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:6",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:6"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "api:isinstance",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "tool-input:value",
+          "to": "source:fixed:probe.py:4",
+          "edge_type": "control",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Tool input field is referenced by the parsed source node",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:4",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:2",
+          "to": "api:mcp.tool",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:2"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "source:vulnerable:probe.py:4",
+          "edge_type": "control",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Repair guard controls the corresponding origin call in the same function",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "source:vulnerable:probe.py:2",
+          "edge_type": "control",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Repair guard controls the corresponding origin call in the same function",
+          "evidence_refs": [
+            "probe.py:2",
+            "probe.py:4"
+          ]
+        }
+      ],
+      "sink_candidates": [
+        {
+          "layer": "MCP_TOOL_RESULT",
+          "tool": "probe",
+          "field_paths": [
+            "tool_result.derived_value"
+          ]
+        },
+        {
+          "layer": "L4_MODEL_VISIBLE_OBSERVATION",
+          "tool": "probe",
+          "field_paths": [
+            "tool_result.derived_value"
+          ]
+        }
+      ],
+      "evidence_refs": [
+        "probe.py:4",
+        "patch:probe.py",
+        "trace:vulnerable:L2",
+        "trace:fixed:L2",
+        "trace:vulnerable:L4",
+        "trace:fixed:L4"
+      ],
+      "confidence": 0.92,
+      "effect_role": "INTERMEDIATE",
+      "classification_status": "PARTIAL",
+      "provenance_status": "PARTIAL",
+      "effect_realization": {
+        "status": "NOT_REALIZED",
+        "witness_refs": [],
+        "sink_refs": []
+      },
+      "propagation": {
+        "tool_result": "REACHED",
+        "host": "REACHED",
+        "session": "REACHED",
+        "agent_observation": "REACHED",
+        "max_reached_level": "L4"
+      }
+    },
+    {
+      "effect_id": "effect-resource-1",
+      "effect_kind": "RESOURCE_EFFECT",
+      "instance_key": "724e689286d44e81",
+      "origin": {
+        "functions": [
+          "probe"
+        ],
+        "apis": [
+          "fixture_package.execute"
+        ],
+        "source_refs": [
+          "probe.py:6",
+          "probe.py:4"
+        ],
+        "runtime_call_differences": [],
+        "anchor_refs": [
+          "anchor-1",
+          "anchor-2",
+          "anchor-3",
+          "anchor-4",
+          "anchor-5"
+        ],
+        "source_locations": [],
+        "tool_call_identity": null,
+        "runtime_event": null
+      },
+      "object": {
+        "kind": "external resource/state",
+        "field_paths": [],
+        "semantic_fields": [],
+        "resource_events": [],
+        "resource_identity": null,
+        "operation": null,
+        "before_state": null,
+        "after_state": null,
+        "readback_paths": [],
+        "instance_signature": "724e689286d44e81"
+      },
+      "condition": {
+        "input_fields": [
+          "value"
+        ],
+        "predicates": [
+          "not isinstance(value, str)"
+        ],
+        "patch_derived": true,
+        "dynamic_difference": {
+          "changed_fields": [
+            "derived_value",
+            "status"
+          ],
+          "changed_paths": [
+            "tool_result.derived_value",
+            "tool_result.status"
+          ],
+          "return_events_changed": [
+            "content#260614e38831f59f",
+            "content#3f4075ec78da34c1",
+            "return#260614e38831f59f",
+            "return#3f4075ec78da34c1"
+          ]
+        },
+        "production_evidence": [
+          "probe.py:6",
+          "probe.py:4",
+          "patch:probe.py",
+          "trace:vulnerable:L2",
+          "trace:fixed:L2",
+          "trace:vulnerable:L4",
+          "trace:fixed:L4"
+        ],
+        "production_predicate": {
+          "anchor_reached": true,
+          "effect_specific_witness": "resource_event"
+        }
+      },
+      "carrier": {
+        "levels": [],
+        "field_names": [],
+        "paths": [],
+        "tool_names": [],
+        "provenance_fields": [],
+        "provenance_paths": [],
+        "value_predicate": null,
+        "vulnerable_value_digests": {},
+        "fixed_value_digests": {},
+        "carrier_kind": "RESOURCE_EVENT",
+        "readback_paths": [],
+        "transformations": [],
+        "kind": "side_effect_only",
+        "path": null,
+        "projection": "server_or_external_state",
+        "field_mapping": "runtime state -> no Tool result field",
+        "l4_eligible": false,
+        "resource_operation": null
+      },
+      "provenance": [
+        {
+          "from": "source:fixed:probe.py:5",
+          "to": "api:ValueError",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:5"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:6",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:6"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "api:isinstance",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:4",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:2",
+          "to": "api:mcp.tool",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:2"
+          ]
+        }
+      ],
+      "sink_candidates": [
+        {
+          "layer": "PROGRAM_RUNTIME",
+          "kind": "RESOURCE_EFFECT"
+        }
+      ],
+      "evidence_refs": [
+        "probe.py:6",
+        "probe.py:4",
+        "patch:probe.py",
+        "trace:vulnerable:L2",
+        "trace:fixed:L2",
+        "trace:vulnerable:L4",
+        "trace:fixed:L4"
+      ],
+      "confidence": 0.82,
+      "effect_role": "TERMINAL",
+      "classification_status": "PARTIAL",
+      "provenance_status": "PARTIAL",
+      "effect_realization": {
+        "status": "NOT_REALIZED",
+        "witness_refs": [],
+        "sink_refs": []
+      },
+      "propagation": {
+        "tool_result": "NOT_REACHED",
+        "host": "NOT_REACHED",
+        "session": "NOT_REACHED",
+        "agent_observation": "NOT_REACHED",
+        "max_reached_level": "UNASSESSED"
+      }
+    },
+    {
+      "effect_id": "effect-value-1",
+      "effect_kind": "VALUE_EFFECT",
+      "instance_key": "3bc52cfe19fd6970",
+      "origin": {
+        "functions": [
+          "probe"
+        ],
+        "apis": [
+          "fixture_package.execute",
+          "mcp.tool"
+        ],
+        "source_refs": [
+          "probe.py:4",
+          "probe.py:2"
+        ],
+        "runtime_call_differences": [],
+        "anchor_refs": [
+          "anchor-1",
+          "anchor-2",
+          "anchor-3",
+          "anchor-4",
+          "anchor-5"
+        ],
+        "source_locations": [],
+        "tool_call_identity": null,
+        "runtime_event": null
+      },
+      "object": {
+        "kind": "program data value",
+        "field_paths": [
+          "tool_result.derived_value"
+        ],
+        "semantic_fields": [
+          "derived_value"
+        ],
+        "resource_events": [],
+        "resource_identity": null,
+        "operation": null,
+        "before_state": null,
+        "after_state": null,
+        "readback_paths": [],
+        "instance_signature": "3bc52cfe19fd6970"
+      },
+      "condition": {
+        "input_fields": [
+          "value"
+        ],
+        "predicates": [
+          "not isinstance(value, str)"
+        ],
+        "patch_derived": true,
+        "dynamic_difference": {
+          "changed_fields": [
+            "derived_value",
+            "status"
+          ],
+          "changed_paths": [
+            "tool_result.derived_value",
+            "tool_result.status"
+          ],
+          "return_events_changed": [
+            "content#260614e38831f59f",
+            "content#3f4075ec78da34c1",
+            "return#260614e38831f59f",
+            "return#3f4075ec78da34c1"
+          ]
+        },
+        "production_evidence": [
+          "probe.py:4",
+          "probe.py:2",
+          "patch:probe.py",
+          "trace:vulnerable:L2",
+          "trace:fixed:L2",
+          "trace:vulnerable:L4",
+          "trace:fixed:L4"
+        ],
+        "production_predicate": {
+          "anchor_reached": true,
+          "effect_specific_witness": "differential_carrier_value"
+        }
+      },
+      "carrier": {
+        "levels": [
+          "L0",
+          "L1",
+          "L2",
+          "L3",
+          "L4"
+        ],
+        "field_names": [
+          "derived_value"
+        ],
+        "paths": [
+          "tool_result.derived_value"
+        ],
+        "tool_names": [
+          "probe"
+        ],
+        "provenance_fields": [
+          "derived_value"
+        ],
+        "provenance_paths": [
+          "tool_result.derived_value"
+        ],
+        "value_predicate": "same-run-tool-result-to-l4-digest",
+        "vulnerable_value_digests": {
+          "tool_result.derived_value": [
+            "79e4471b427062ea"
+          ]
+        },
+        "fixed_value_digests": {},
+        "carrier_kind": "PROGRAM_VALUE",
+        "readback_paths": [],
+        "transformations": [],
+        "kind": "returned_value",
+        "path": "tool_result.derived_value",
+        "projection": "tool_result_to_host_to_session_to_model",
+        "field_mapping": "tool_result.derived_value -> L0 -> L1 -> L2 -> L3 -> L4",
+        "l4_eligible": true,
+        "resource_operation": null
+      },
+      "provenance": [
+        {
+          "from": "source:fixed:probe.py:5",
+          "to": "api:ValueError",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:5"
+          ]
+        },
+        {
+          "from": "tool-input:value",
+          "to": "source:fixed:probe.py:6",
+          "edge_type": "data",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Tool input field is referenced by the parsed source node",
+          "evidence_refs": [
+            "probe.py:6"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:6",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:6"
+          ]
+        },
+        {
+          "from": "tool-input:value",
+          "to": "source:fixed:probe.py:4",
+          "edge_type": "data",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Tool input field is referenced by the parsed source node",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:fixed:probe.py:4",
+          "to": "api:isinstance",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "tool-input:value",
+          "to": "source:vulnerable:probe.py:4",
+          "edge_type": "data",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Tool input field is referenced by the parsed source node",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:4",
+          "to": "api:fixture_package.execute",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:4"
+          ]
+        },
+        {
+          "from": "source:vulnerable:probe.py:2",
+          "to": "api:mcp.tool",
+          "edge_type": "call",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Parsed source call invokes the effect-origin API",
+          "evidence_refs": [
+            "probe.py:2"
+          ]
+        },
+        {
+          "from": "api:fixture_package.execute",
+          "to": "effect-carrier:tool_result.derived_value",
+          "edge_type": "data",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Paired trace identifies a vulnerable-side differential value at this carrier path",
+          "evidence_refs": [
+            "trace-path:tool_result.derived_value",
+            "trace:fixed:L2",
+            "trace:vulnerable:L2"
+          ]
+        },
+        {
+          "from": "api:mcp.tool",
+          "to": "effect-carrier:tool_result.derived_value",
+          "edge_type": "data",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "Paired trace identifies a vulnerable-side differential value at this carrier path",
+          "evidence_refs": [
+            "trace-path:tool_result.derived_value",
+            "trace:fixed:L2",
+            "trace:vulnerable:L2"
+          ]
+        },
+        {
+          "from": "effect-carrier:tool_result.derived_value",
+          "to": "tool-result:tool_result.derived_value",
+          "edge_type": "serialize",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "The differential carrier is serialized into the Tool result",
+          "evidence_refs": [
+            "trace-path:tool_result.derived_value",
+            "trace:vulnerable:L2"
+          ]
+        },
+        {
+          "from": "tool-result:tool_result.derived_value",
+          "to": "model-observation:tool_result.derived_value",
+          "edge_type": "observe",
+          "slice_direction": [
+            "forward",
+            "backward"
+          ],
+          "description": "The same value digest occurs at the Tool-result and L4 boundaries",
+          "evidence_refs": [
+            "trace-path:tool_result.derived_value",
+            "trace:vulnerable:L2",
+            "trace:vulnerable:L4"
+          ]
+        }
+      ],
+      "sink_candidates": [
+        {
+          "layer": "MCP_TOOL_RESULT",
+          "tool": "probe",
+          "field_paths": [
+            "tool_result.derived_value"
+          ]
+        },
+        {
+          "layer": "L4_MODEL_VISIBLE_OBSERVATION",
+          "tool": "probe",
+          "field_paths": [
+            "tool_result.derived_value"
+          ]
+        }
+      ],
+      "evidence_refs": [
+        "probe.py:4",
+        "probe.py:2",
+        "patch:probe.py",
+        "trace:vulnerable:L2",
+        "trace:fixed:L2",
+        "trace:vulnerable:L4",
+        "trace:fixed:L4"
+      ],
+      "confidence": 0.92,
+      "effect_role": "TERMINAL",
+      "classification_status": "SUPPORTED",
+      "provenance_status": "PARTIAL",
+      "effect_realization": {
+        "status": "REALIZED",
+        "witness_refs": [
+          "trace:L2_HOST_PROCESSED_TOOL_RESULT:tool-result-carrier",
+          "trace:L2_OR_L3:tool-result-carrier",
+          "trace:L3_SESSION_TOOL_RESULT:tool-result-carrier"
+        ],
+        "sink_refs": [
+          "L4_MODEL_VISIBLE_OBSERVATION",
+          "MCP_TOOL_RESULT"
+        ]
+      },
+      "propagation": {
+        "tool_result": "REACHED",
+        "host": "REACHED",
+        "session": "REACHED",
+        "agent_observation": "REACHED",
+        "max_reached_level": "L4"
+      }
+    }
+  ],
+  "effect_relations": [
+    {
+      "from": "effect-control-cf708e03ed94-1",
+      "to": "effect-resource-1",
+      "relation": "CAUSES",
+      "evidence_refs": [
+        "patch:probe.py",
+        "probe.py:4",
+        "probe.py:6",
+        "trace:fixed:L2",
+        "trace:fixed:L4",
+        "trace:vulnerable:L2",
+        "trace:vulnerable:L4"
+      ],
+      "reason": "paired runtime trace/span aligns the control event with the resource operation",
+      "provenance_status": "SUPPORTED"
+    },
+    {
+      "from": "effect-control-cf708e03ed94-2",
+      "to": "effect-resource-1",
+      "relation": "CAUSES",
+      "evidence_refs": [
+        "patch:probe.py",
+        "probe.py:4",
+        "probe.py:6",
+        "trace:fixed:L2",
+        "trace:fixed:L4",
+        "trace:vulnerable:L2",
+        "trace:vulnerable:L4"
+      ],
+      "reason": "paired runtime trace/span aligns the control event with the resource operation",
+      "provenance_status": "SUPPORTED"
+    }
+  ],
+  "counterfactual_checks": [
+    {
+      "check_id": "counterfactual-1",
+      "kind": "vulnerable-trigger-input",
+      "role": "trigger",
+      "status": "SUPPORTED",
+      "execution_status": "OBSERVED",
+      "effect_observed": true,
+      "matched_effect_paths": [
+        "tool_result.derived_value"
+      ],
+      "input_digest": "1a350788e99ad460a7a64cc0fd4ab5355a5947d217123f05e662e1434f73f196",
+      "input_attested": true
+    },
+    {
+      "check_id": "counterfactual-2",
+      "kind": "fixed-version-same-input",
+      "role": "fixed",
+      "status": "SUPPORTED",
+      "execution_status": "OBSERVED",
+      "effect_observed": false,
+      "matched_effect_paths": [],
+      "input_digest": "1a350788e99ad460a7a64cc0fd4ab5355a5947d217123f05e662e1434f73f196",
+      "input_attested": true
+    },
+    {
+      "check_id": "counterfactual-3",
+      "kind": "safe-input",
+      "role": "safe",
+      "status": "SUPPORTED",
+      "execution_status": "OBSERVED",
+      "effect_observed": false,
+      "matched_effect_paths": [],
+      "input_digest": "1994dd583bf4dc32b5e66b075611594517bbee261f9171b3fc36ee9af2a834b2",
+      "input_attested": true
+    },
+    {
+      "check_id": "counterfactual-4",
+      "kind": "replace-trigger-field",
+      "role": "field-only",
+      "status": "SUPPORTED",
+      "execution_status": "OBSERVED",
+      "effect_observed": false,
+      "matched_effect_paths": [],
+      "input_digest": "1994dd583bf4dc32b5e66b075611594517bbee261f9171b3fc36ee9af2a834b2",
+      "input_attested": true
+    },
+    {
+      "check_id": "counterfactual-5",
+      "kind": "replace-unrelated-field",
+      "role": "unrelated",
+      "status": "SUPPORTED",
+      "execution_status": "OBSERVED",
+      "effect_observed": true,
+      "matched_effect_paths": [
+        "tool_result.derived_value"
+      ],
+      "input_digest": "ef9bde551526d85fb8c5d20e1a6c429bd392531a0fdb7b5c062965399aa3ab6a",
+      "input_attested": true
+    }
+  ],
+  "fixed_side_blocked": true,
+  "modeling_reasons": [
+    "generated from independently evidenced control, resource, and value effect candidates; category metadata was not used as an effect gate"
+  ]
+}

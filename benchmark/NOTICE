@@ -1,0 +1,10 @@
+OSCAR-Benchmark
+Label-free benchmark packaging and metadata for OSCAR
+
+Copyright 2026 OSCAR Authors
+
+The Apache License 2.0 applies only to original benchmark packaging code and
+metadata for which the OSCAR Authors hold the necessary rights. Bundled
+upstream source, dependencies, patches, fixtures, and documentation retain
+their original licenses and notices.
+
